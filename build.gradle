@@ -1,0 +1,90 @@
+buildscript {
+    ext {
+        springBootVersion = '2.1.0.RELEASE'
+    }
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
+    }
+}
+
+plugins {
+    id "com.commercehub.cucumber-jvm" version "0.14"
+    id "com.github.kuldeepg.springbootutility" version "1.1"
+    id 'com.palantir.docker' version '0.20.1'
+    id 'com.palantir.docker-run' version '0.20.1'
+}
+
+apply plugin: 'java'
+apply plugin: 'org.springframework.boot'
+apply plugin: 'io.spring.dependency-management'
+
+version = "0.1-SNAPSHOT"
+group = "com.pillar"
+sourceCompatibility = '1.8'
+targetCompatibility = '1.8'
+
+addCucumberSuite 'cucumberTest'
+
+cucumberTest {
+    stepDefinitionRoots = ['com.pillar']
+    systemProperties = [
+            "integration-endpoint": "http://localhost:8080"
+    ]
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile 'org.springframework.boot:spring-boot-starter-web'
+    compile 'org.springframework.boot:spring-boot-starter-webflux'
+    compile 'org.springframework.boot:spring-boot-starter-actuator'
+	testCompile 'org.springframework.boot:spring-boot-starter-test'
+    cucumberTestCompile 'io.cucumber:cucumber-java:4.2.0'
+    cucumberTestCompile 'org.springframework.boot:spring-boot-starter-logging'
+    cucumberTestCompile 'io.cucumber:cucumber-junit:4.2.0'
+}
+
+docker {
+    name "${project.group}/${bootJar.baseName}"
+    files bootJar.outputs.files
+    buildArgs([JAR_FILE: bootJar.archiveName])
+    dockerfile project.file('src/main/resources/Dockerfile')
+}
+
+dockerRun {
+    name "${project.name}-integration-test"
+    image "${project.docker.name}"
+    ports '8080:8080'
+    clean true
+}
+
+tasks.dockerRun.dependsOn('docker')
+
+task integrationTestSetup(dependsOn: 'dockerRun') {
+    doLast {
+        for (int i = 0; i < 10; i++) {
+            try {
+                new URL("http://localhost:8080/actuator/health").text
+                return
+            } catch (IOException e) {
+                sleep(1000)
+            }
+        }
+
+        throw new GradleException("Unable to query api endpoint")
+    }
+}
+
+task integrationTestTeardown(dependsOn: 'dockerStop') {}
+
+cucumberTest.dependsOn('integrationTestSetup')
+cucumberTest.finalizedBy('integrationTestTeardown')
+
+wrapper {
+	gradleVersion = '4.9'
+}

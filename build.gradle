@@ -21,17 +21,23 @@ apply plugin: 'java'
 apply plugin: 'org.springframework.boot'
 apply plugin: 'io.spring.dependency-management'
 
+wrapper {
+    gradleVersion = '4.9'
+}
+
 version = "0.1-SNAPSHOT"
 group = "com.pillar"
 sourceCompatibility = '1.8'
 targetCompatibility = '1.8'
 
-addCucumberSuite 'cucumberTest'
+Integer integrationTestPort = 8080
+String integrationTestBaseUrl = "http://localhost:${integrationTestPort}"
 
+addCucumberSuite 'cucumberTest'
 cucumberTest {
     stepDefinitionRoots = ['com.pillar']
     systemProperties = [
-            "integration-endpoint": "http://localhost:8080"
+            "integration-endpoint": integrationTestBaseUrl
     ]
 }
 
@@ -59,7 +65,7 @@ docker {
 dockerRun {
     name "${project.name}-integration-test"
     image "${project.docker.name}"
-    ports '8080:8080'
+    ports "$integrationTestPort:$integrationTestPort"
     clean true
 }
 
@@ -69,7 +75,7 @@ task integrationTestSetup(dependsOn: 'dockerRun') {
     doLast {
         for (int i = 0; i < 10; i++) {
             try {
-                new URL("http://localhost:8080/actuator/health").text
+                new URL("${integrationTestBaseUrl}/actuator/health").text
                 return
             } catch (IOException e) {
                 sleep(1000)
@@ -84,7 +90,3 @@ task integrationTestTeardown(dependsOn: 'dockerStop') {}
 
 cucumberTest.dependsOn('integrationTestSetup')
 cucumberTest.finalizedBy('integrationTestTeardown')
-
-wrapper {
-	gradleVersion = '4.9'
-}

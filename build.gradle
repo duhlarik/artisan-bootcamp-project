@@ -15,6 +15,7 @@ plugins {
     id "com.github.kuldeepg.springbootutility" version "1.1"
     id 'com.palantir.docker' version '0.20.1'
     id 'com.palantir.docker-run' version '0.20.1'
+    id 'com.avast.gradle.docker-compose' version "0.8.12"
 }
 
 apply plugin: 'java'
@@ -32,12 +33,14 @@ targetCompatibility = '1.8'
 
 Integer integrationTestPort = 8080
 String integrationTestBaseUrl = "http://localhost:${integrationTestPort}"
+String integrationTestMysql = "jdbc:mysql://localhost:3306/cc_processing"
 
 addCucumberSuite 'cucumberTest'
 cucumberTest {
     stepDefinitionRoots = ['com.pillar']
     systemProperties = [
-            "integration-endpoint": integrationTestBaseUrl
+            "integration-endpoint": integrationTestBaseUrl,
+            "integration-mysql": integrationTestMysql
     ]
 }
 
@@ -49,6 +52,9 @@ dependencies {
     compile 'org.springframework.boot:spring-boot-starter-web'
     compile 'org.springframework.boot:spring-boot-starter-webflux'
     compile 'org.springframework.boot:spring-boot-starter-actuator'
+    compile 'org.springframework.boot:spring-boot-starter-data-jpa'
+    compile 'mysql:mysql-connector-java'
+    compile 'org.flywaydb:flyway-core'
 	testCompile 'org.springframework.boot:spring-boot-starter-test'
     cucumberTestCompile 'io.cucumber:cucumber-java:4.2.0'
     cucumberTestCompile 'org.springframework.boot:spring-boot-starter-logging'
@@ -69,11 +75,22 @@ dockerRun {
     clean true
 }
 
-tasks.dockerRun.dependsOn('docker')
+dockerCompose {
+    mysqlOnly {
+        startedServices = ['mysql']
+    }
+}
 
-task integrationTestSetup(dependsOn: 'dockerRun') {
+task testEnvPath(type: Exec) {
+    commandLine 'env'
+}
+
+tasks.dockerRun.dependsOn('docker')
+tasks.composeUp.dependsOn('docker')
+
+task integrationTestSetup(dependsOn: 'composeUp') {
     doLast {
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < 30; i++) {
             try {
                 new URL("${integrationTestBaseUrl}/actuator/health").text
                 return
@@ -86,7 +103,8 @@ task integrationTestSetup(dependsOn: 'dockerRun') {
     }
 }
 
-task integrationTestTeardown(dependsOn: 'dockerStop') {}
+task integrationTestTeardown(dependsOn: 'composeDown') {}
+//tasks.dockerRemoveContainer.dependsOn('dockerStop')
 
 cucumberTest.dependsOn('integrationTestSetup')
 cucumberTest.finalizedBy('integrationTestTeardown')

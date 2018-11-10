@@ -21,8 +21,7 @@ public class StatusStepdefs {
 
     @Given("the health endpoint")
     public void theHealthEndpoint() {
-        endpoint = System.getProperty("integration-endpoint");
-        log.info("Health Endpoint: " + endpoint + statusUrl);
+        endpoint = System.getProperty("integration-endpoint", "http://localhost:8080");
     }
 
     @When("I request the status")
@@ -33,12 +32,11 @@ public class StatusStepdefs {
 
     @Then("I receive an {string}")
     public void iReceiveAn(String status) {
-        log.info("Checking on status: " + status);
         if (status.equals("OK")) {
             HttpStatus httpStatus = response.block().statusCode();
-            log.info("Actual status is: " + httpStatus);
             assertEquals(httpStatus, HttpStatus.OK);
         } else {
+            log.error("Unknown status to query for: " + status);
             throw new cucumber.api.PendingException();
         }
     }

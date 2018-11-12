@@ -44,6 +44,18 @@ cucumberTest {
     ]
 }
 
+sourceSets {
+    intTest {
+        compileClasspath += sourceSets.main.output
+        runtimeClasspath += sourceSets.main.output
+    }
+}
+
+configurations {
+    intTestImplementation.extendsFrom testImplementation
+    intTestRuntimeOnly.extendsFrom testRuntimeOnly
+}
+
 repositories {
     mavenCentral()
 }
@@ -81,14 +93,10 @@ dockerCompose {
     }
 }
 
-task testEnvPath(type: Exec) {
-    commandLine 'env'
-}
-
 tasks.dockerRun.dependsOn('docker')
 tasks.composeUp.dependsOn('docker')
 
-task integrationTestSetup(dependsOn: 'composeUp') {
+task cucumberTestSetup(dependsOn: 'composeUp') {
     doLast {
         for (int i = 0; i < 30; i++) {
             try {
@@ -103,8 +111,31 @@ task integrationTestSetup(dependsOn: 'composeUp') {
     }
 }
 
-task integrationTestTeardown(dependsOn: 'composeDown') {}
-//tasks.dockerRemoveContainer.dependsOn('dockerStop')
+task cucumberTestTeardown(dependsOn: 'composeDown') {}
 
-cucumberTest.dependsOn('integrationTestSetup')
-cucumberTest.finalizedBy('integrationTestTeardown')
+cucumberTest.dependsOn('cucumberTestSetup')
+cucumberTest.finalizedBy('cucumberTestTeardown')
+
+task integrationTestSetup(dependsOn: 'mysqlOnlyComposeUp') {
+    doLast {
+        // Check on db server state
+    }
+}
+
+task integrationTestTeardown(dependsOn: 'mysqlOnlyComposeDown') {
+    doLast {
+
+    }
+}
+
+task integrationTest(type: Test, dependsOn: 'integrationTestSetup') {
+    description = 'Runs integration tests.'
+    group = 'verification'
+
+    testClassesDirs = sourceSets.intTest.output.classesDirs
+    classpath = sourceSets.intTest.runtimeClasspath
+    shouldRunAfter test
+    finalizedBy integrationTestTeardown
+}
+
+//check.dependsOn integrationTest

@@ -6,15 +6,22 @@ import javax.persistence.Id;
 @Entity
 public class Merchant {
     @Id
-    private Long id;
+    private Integer id;
 
     private String name;
 
-    public Long getId() {
+    public Merchant() {}
+
+    public Merchant(Integer id, String name) {
+        this.id = id;
+        this.name = name;
+    }
+
+    public Integer getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 

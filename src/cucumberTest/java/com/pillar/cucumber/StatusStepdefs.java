@@ -1,4 +1,4 @@
-package com.pillar;
+package com.pillar.cucumber;
 
 import cucumber.api.java.en.Given;
 import cucumber.api.java.en.Then;

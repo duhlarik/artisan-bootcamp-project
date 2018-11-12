@@ -1,4 +1,4 @@
-package com.pillar;
+package com.pillar.cucumber;
 
 import com.mysql.cj.jdbc.MysqlDataSource;
 import cucumber.api.java.en.Given;
@@ -30,7 +30,7 @@ public class MerchantStepdefs {
         dataSource.setUser("root");
         dataSource.setPassword("password");
         JdbcTemplate template = new JdbcTemplate(dataSource);
-        template.update("INSERT INTO merchants SET id=?, name=?", 1, "Test Merchant");
+        template.update("INSERT INTO merchant SET id=?, name=?", 1, "Test Merchant");
     }
 
     @When("I request it's information")

@@ -12,9 +12,7 @@ buildscript {
 
 plugins {
     id "com.commercehub.cucumber-jvm" version "0.14"
-    id "com.github.kuldeepg.springbootutility" version "1.1"
     id 'com.palantir.docker' version '0.20.1'
-    id 'com.palantir.docker-run' version '0.20.1'
     id 'com.avast.gradle.docker-compose' version "0.8.12"
 }
 
@@ -80,20 +78,12 @@ docker {
     dockerfile project.file('src/main/resources/Dockerfile')
 }
 
-dockerRun {
-    name "${project.name}-integration-test"
-    image "${project.docker.name}"
-    ports "$integrationTestPort:$integrationTestPort"
-    clean true
-}
-
 dockerCompose {
     mysqlOnly {
         startedServices = ['mysql']
     }
 }
 
-tasks.dockerRun.dependsOn('docker')
 tasks.composeUp.dependsOn('docker')
 
 task cucumberTestSetup(dependsOn: 'composeUp') {

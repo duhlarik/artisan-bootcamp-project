@@ -6,10 +6,12 @@ import com.pillar.merchant.Merchant;
 import com.pillar.merchant.MerchantRepository;
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.http.ResponseEntity;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -17,8 +19,7 @@ import java.util.Optional;
 import java.util.stream.Stream;
 
 import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -78,10 +79,8 @@ public class TestMerchantApiController {
 
     @Test
     public void whenAMerchant1IsRequestedIGetTheTestMerchant() {
-        int id = Optional.ofNullable(controller.getMerchant(TEST_MERCHANT_ID).getBody())
-                .map(Merchant::getId)
-                .orElse(INVALID_MERCHANT_ID);
-        assertEquals(TEST_MERCHANT_ID, id);
+        ResponseEntity<Merchant> merchantResponse = controller.getMerchant(TEST_MERCHANT_ID);
+        assertEquals(TEST_MERCHANT_ID, (int) extractIdFromMerchantResponse(merchantResponse));
     }
 
     @Test
@@ -116,25 +115,34 @@ public class TestMerchantApiController {
 
     @Test
     public void aGetRequestForAllMerchantsContainsTheTestMerchant() throws Exception {
-        long count = getMerchantsFromResponseJson(queryApi(API_ALL_MERCHANTS))
-                .map(Merchant::getId)
-                .filter(id -> id == TEST_MERCHANT_ID)
-                .count();
-
-        assertEquals(1, count);
+        ResultActions result = queryApi(API_ALL_MERCHANTS);
+        assertTrue(containsMerchantWithId(result, TEST_MERCHANT_ID));
     }
 
     private ResultActions queryApi(String s) throws Exception {
         return mockMvc.perform(get(s));
     }
 
-    private Stream<Merchant> getMerchantsFromResponseJson(ResultActions result) throws java.io.IOException {
+    private Integer extractIdFromMerchantResponse(ResponseEntity<Merchant> merchantResponse) {
+        return Optional.ofNullable(merchantResponse.getBody())
+                .map(Merchant::getId)
+                .orElse(INVALID_MERCHANT_ID);
+    }
+
+    private boolean containsMerchantWithId(ResultActions result, int testMerchantId) throws IOException {
+        return getMerchantsFromResponseJson(result)
+                .map(Merchant::getId)
+                .anyMatch(id -> id == testMerchantId);
+    }
+
+    private Stream<Merchant> getMerchantsFromResponseJson(ResultActions result) throws IOException {
         String content = result
                 .andReturn()
                 .getResponse()
                 .getContentAsString();
 
-        List<Merchant> merchants = objectMapper.readValue(content, new TypeReference<List<Merchant>>() {});
+        List<Merchant> merchants = objectMapper.readValue(content, new TypeReference<List<Merchant>>() {
+        });
         return merchants.stream();
     }
 }

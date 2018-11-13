@@ -23,6 +23,9 @@ import static org.junit.Assert.assertEquals;
 @RunWith(SpringRunner.class)
 public class TestMerchant {
 
+    private static final String TEST_MERCHANT_NAME = "Test Merchant";
+    private static final int TEST_MERCHANT_ID = 1;
+
     @Autowired
     MerchantRepository merchantRepository;
 
@@ -44,16 +47,16 @@ public class TestMerchant {
     public void testTableWithOneNamedMerchantReturnsFromRepository() {
         insertTestMerchant();
 
-        Merchant merchant = merchantRepository.getOne(1);
+        Merchant merchant = merchantRepository.getOne(TEST_MERCHANT_ID);
 
-        assertEquals("Test Merchant", merchant.getName());
+        assertEquals(TEST_MERCHANT_NAME, merchant.getName());
     }
 
     @Test
     public void testApiReturnsTestMerchantWhenQueriedForId1() {
         insertTestMerchant();
 
-        Merchant test_merchant = new Merchant(1, "Test Merchant");
+        Merchant test_merchant = new Merchant(TEST_MERCHANT_ID, TEST_MERCHANT_NAME);
 
         WebClient client = WebClient.create("http://localhost:" + randomServerPort);
         Merchant response = client
@@ -72,6 +75,6 @@ public class TestMerchant {
     }
 
     private int insertTestMerchant() {
-        return jdbcTemplate.update("INSERT INTO merchant SET id=?, name=?", 1, "Test Merchant");
+        return jdbcTemplate.update("INSERT INTO merchant SET id=?, name=?", TEST_MERCHANT_ID, TEST_MERCHANT_NAME);
     }
 }

@@ -32,4 +32,16 @@ public class Merchant {
     public void setName(String name) {
         this.name = name;
     }
+
+    @Override
+    public boolean equals(Object other) {
+        if (other == null) {
+            return false;
+        }
+
+        if (!getClass().isInstance(other)) {
+            return false;
+        }
+        return id.equals(((Merchant)other).getId());
+    }
 }

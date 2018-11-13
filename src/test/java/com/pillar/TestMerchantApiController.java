@@ -6,7 +6,6 @@ import com.pillar.merchant.Merchant;
 import com.pillar.merchant.MerchantRepository;
 import org.junit.Before;
 import org.junit.Test;
-import org.springframework.http.ResponseEntity;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -14,6 +13,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 import static org.hamcrest.Matchers.is;
@@ -26,9 +26,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 
-public class TestMerchantApi {
+public class TestMerchantApiController {
     private static final String API_MERCHANT_1 = "/api/merchant/1";
-    private MerchantApi controller;
+    private MerchantApiController controller;
     private MerchantRepository repository;
     private MockMvc mockMvc;
     private Merchant testMerchant;
@@ -38,17 +38,17 @@ public class TestMerchantApi {
     @Before
     public void setUp() {
         repository = mock(MerchantRepository.class);
-        controller = new MerchantApi(repository);
+        controller = new MerchantApiController(repository);
 
         testMerchant = new Merchant(1, "Test Merchant");
 
         when(repository.getOne(1)).thenReturn(testMerchant);
+        when(repository.findById(1)).thenReturn(Optional.of(testMerchant));
 
         merchantRepoList = new ArrayList<>(Collections.singletonList(testMerchant));
         when(repository.findAll()).then((invocation) -> merchantRepoList);
 
-        mockMvc = MockMvcBuilders.standaloneSetup(controller)
-                .build();
+        mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
         objectMapper = new ObjectMapper();
     }
 
@@ -113,7 +113,8 @@ public class TestMerchantApi {
 
     private Stream<Merchant> getMerchantsFromResponseJson(ResultActions result) throws java.io.IOException {
         String content = result.andReturn().getResponse().getContentAsString();
-        List<Merchant> merchants = objectMapper.readValue(content, new TypeReference<List<Merchant>>() {});
+        List<Merchant> merchants = objectMapper.readValue(content, new TypeReference<List<Merchant>>() {
+        });
         return merchants.stream();
     }
 }

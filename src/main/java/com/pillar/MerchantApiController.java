@@ -13,10 +13,10 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/merchant")
-public class MerchantApi {
+public class MerchantApiController {
     private MerchantRepository repository;
 
-    public MerchantApi(MerchantRepository repository) {
+    public MerchantApiController(MerchantRepository repository) {
         this.repository = repository;
     }
 
@@ -27,10 +27,8 @@ public class MerchantApi {
 
     @RequestMapping(path = "/{id}", method = {RequestMethod.GET})
     public ResponseEntity<Merchant> getMerchant(@PathVariable Integer id) {
-        Merchant merchant = repository.getOne(id);
-        if (merchant != null) {
-            return new ResponseEntity<>(merchant, HttpStatus.OK);
-        }
-        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        return repository.findById(id)
+                .map((merchant) -> new ResponseEntity<>(merchant, HttpStatus.OK))
+                .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 }

@@ -39,7 +39,7 @@ public class MerchantStepdefs {
         WebClient client = WebClient.create(endpoint);
         response = client
                 .get()
-                .uri("/api/merchant/" + id)
+                .uri("/api/merchant/1")
                 .retrieve()
                 .bodyToMono(Map.class)
                 .block();

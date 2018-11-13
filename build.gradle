@@ -73,9 +73,9 @@ dependencies {
 
 docker {
     name "${project.group}/${bootJar.baseName}"
-    files bootJar.outputs.files
+    files bootJar.outputs.files, file('src/main/scripts/wait-for.sh')
     buildArgs([JAR_FILE: bootJar.archiveName])
-    dockerfile project.file('src/main/resources/Dockerfile')
+    dockerfile project.file('src/main/scripts/Dockerfile')
 }
 
 dockerCompose {
@@ -86,46 +86,21 @@ dockerCompose {
 
 tasks.composeUp.dependsOn('docker')
 
-task cucumberTestSetup(dependsOn: 'composeUp') {
-    doLast {
-        for (int i = 0; i < 30; i++) {
-            try {
-                new URL("${integrationTestBaseUrl}/actuator/health").text
-                return
-            } catch (IOException e) {
-                sleep(1000)
-            }
-        }
-
-        throw new GradleException("Unable to query api endpoint")
-    }
-}
-
-task cucumberTestTeardown(dependsOn: 'composeDown') {}
-
-cucumberTest.dependsOn('cucumberTestSetup')
-cucumberTest.finalizedBy('cucumberTestTeardown')
-
-task integrationTestSetup(dependsOn: 'mysqlOnlyComposeUp') {
-    doLast {
-        // Check on db server state
-    }
-}
-
-task integrationTestTeardown(dependsOn: 'mysqlOnlyComposeDown') {
-    doLast {
-
-    }
-}
-
-task integrationTest(type: Test, dependsOn: 'integrationTestSetup') {
+task integrationTest(type: Test, dependsOn: 'mysqlOnlyComposeUp') {
     description = 'Runs integration tests.'
     group = 'verification'
 
     testClassesDirs = sourceSets.intTest.output.classesDirs
     classpath = sourceSets.intTest.runtimeClasspath
     shouldRunAfter test
-    finalizedBy integrationTestTeardown
 }
+integrationTest.finalizedBy('mysqlOnlyComposeDown')
 
-//check.dependsOn integrationTest
+check.dependsOn integrationTest
+
+cucumberTest.mustRunAfter('mysqlOnlyComposeDown')
+cucumberTest.dependsOn('composeUp')
+cucumberTest.finalizedBy('composeDown')
+cucumberTest.shouldRunAfter('integrationTest')
+
+check.dependsOn tasks.cucumberTest

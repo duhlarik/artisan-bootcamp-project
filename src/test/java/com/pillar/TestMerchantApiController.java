@@ -28,11 +28,19 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 public class TestMerchantApiController {
     private static final String API_MERCHANT_1 = "/api/merchant/1";
+    private static final String API_ALL_MERCHANTS = "/api/merchant";
+    private static final String TEST_MERCHANT_NAME = "Test Merchant";
+    private static final int TEST_MERCHANT_ID = 1;
+    private static final String API_MERCHANT_2 = "/api/merchant/2";
+    private static final String JSON_NAME_FIELD = "$.name";
+    private static final String JSON_ID_FIELD = "$.id";
+    private static final int INVALID_MERCHANT_ID = 0;
+
     private MerchantApiController controller;
     private MerchantRepository repository;
     private MockMvc mockMvc;
     private Merchant testMerchant;
-    private ArrayList<Merchant> merchantRepoList;
+    private List<Merchant> merchantRepoList;
     private ObjectMapper objectMapper;
 
     @Before
@@ -40,10 +48,9 @@ public class TestMerchantApiController {
         repository = mock(MerchantRepository.class);
         controller = new MerchantApiController(repository);
 
-        testMerchant = new Merchant(1, "Test Merchant");
+        testMerchant = new Merchant(TEST_MERCHANT_ID, TEST_MERCHANT_NAME);
 
-        when(repository.getOne(1)).thenReturn(testMerchant);
-        when(repository.findById(1)).thenReturn(Optional.of(testMerchant));
+        when(repository.findById(TEST_MERCHANT_ID)).thenReturn(Optional.of(testMerchant));
 
         merchantRepoList = new ArrayList<>(Collections.singletonList(testMerchant));
         when(repository.findAll()).then((invocation) -> merchantRepoList);
@@ -71,10 +78,10 @@ public class TestMerchantApiController {
 
     @Test
     public void whenAMerchant1IsRequestedIGetTheTestMerchant() {
-        int id = Optional.ofNullable(controller.getMerchant(1).getBody())
+        int id = Optional.ofNullable(controller.getMerchant(TEST_MERCHANT_ID).getBody())
                 .map(Merchant::getId)
-                .orElse(0);
-        assertEquals(1, id);
+                .orElse(INVALID_MERCHANT_ID);
+        assertEquals(TEST_MERCHANT_ID, id);
     }
 
     @Test
@@ -86,32 +93,32 @@ public class TestMerchantApiController {
     @Test
     public void aGetRequestForMerchant1ReturnsAMerchantWithTheNameTestMerchant() throws Exception {
         queryApi(API_MERCHANT_1)
-                .andExpect(jsonPath("$.name", is("Test Merchant")));
+                .andExpect(jsonPath(JSON_NAME_FIELD, is(TEST_MERCHANT_NAME)));
     }
 
     @Test
     public void aGetRequestForMerchant1ReturnsAMerchantWithTheId1() throws Exception {
         queryApi(API_MERCHANT_1)
-                .andExpect(jsonPath("$.id", is(1)));
+                .andExpect(jsonPath(JSON_ID_FIELD, is(TEST_MERCHANT_ID)));
     }
 
     @Test
     public void aGetRequestForMerchant2ReturnsStatusNotFound() throws Exception {
-        queryApi("/api/merchant/2")
+        queryApi(API_MERCHANT_2)
                 .andExpect(status().isNotFound());
     }
 
     @Test
     public void aGetRequestForAllMerchantsReturnsStatusOk() throws Exception {
-        queryApi("/api/merchant")
+        queryApi(API_ALL_MERCHANTS)
                 .andExpect(status().isOk());
     }
 
     @Test
     public void aGetRequestForAllMerchantsContainsTheTestMerchant() throws Exception {
-        long count = getMerchantsFromResponseJson(queryApi("/api/merchant"))
+        long count = getMerchantsFromResponseJson(queryApi(API_ALL_MERCHANTS))
                 .map(Merchant::getId)
-                .filter(id -> id == 1)
+                .filter(id -> id == TEST_MERCHANT_ID)
                 .count();
 
         assertEquals(1, count);

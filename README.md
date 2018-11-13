@@ -1,10 +1,10 @@
-#Artisan Bootcamp Project
+# Artisan Bootcamp Project
 
-##Required Dependencies
+## Required Dependencies
 * Docker
 * Java 1.8+
 
-##Building and Running the Project
+## Building and Running the Project
 * Build full project with all tests `./gradlew build`
 * Run only unit tests `./gradlew test`
 * Run only integration tests (will automatically start/stop resources) `./gradlew integrationTest`

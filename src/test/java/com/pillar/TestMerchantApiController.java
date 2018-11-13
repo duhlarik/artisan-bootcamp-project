@@ -71,50 +71,63 @@ public class TestMerchantApiController {
 
     @Test
     public void whenAMerchant1IsRequestedIGetTheTestMerchant() {
-        assertEquals(1, (int) controller.getMerchant(1).getBody().getId());
+        int id = Optional.ofNullable(controller.getMerchant(1).getBody())
+                .map(Merchant::getId)
+                .orElse(0);
+        assertEquals(1, id);
     }
 
     @Test
     public void aGetRequestForMerchant1ReturnsStatusOK() throws Exception {
-        mockMvc.perform(get(API_MERCHANT_1))
+        queryApi(API_MERCHANT_1)
                 .andExpect(status().isOk());
     }
 
     @Test
     public void aGetRequestForMerchant1ReturnsAMerchantWithTheNameTestMerchant() throws Exception {
-        mockMvc.perform(get(API_MERCHANT_1))
+        queryApi(API_MERCHANT_1)
                 .andExpect(jsonPath("$.name", is("Test Merchant")));
     }
 
     @Test
     public void aGetRequestForMerchant1ReturnsAMerchantWithTheId1() throws Exception {
-        mockMvc.perform(get(API_MERCHANT_1))
+        queryApi(API_MERCHANT_1)
                 .andExpect(jsonPath("$.id", is(1)));
     }
 
     @Test
     public void aGetRequestForMerchant2ReturnsStatusNotFound() throws Exception {
-        mockMvc.perform(get("/api/merchant/2"))
+        queryApi("/api/merchant/2")
                 .andExpect(status().isNotFound());
     }
 
     @Test
     public void aGetRequestForAllMerchantsReturnsStatusOk() throws Exception {
-        mockMvc.perform(get("/api/merchant"))
+        queryApi("/api/merchant")
                 .andExpect(status().isOk());
     }
 
     @Test
     public void aGetRequestForAllMerchantsContainsTheTestMerchant() throws Exception {
-        Stream<Merchant> merchants = getMerchantsFromResponseJson(mockMvc.perform(get("/api/merchant")));
+        long count = getMerchantsFromResponseJson(queryApi("/api/merchant"))
+                .map(Merchant::getId)
+                .filter(id -> id == 1)
+                .count();
 
-        assertEquals(1, merchants.filter(merchant -> merchant.getId() == 1).count());
+        assertEquals(1, count);
+    }
+
+    private ResultActions queryApi(String s) throws Exception {
+        return mockMvc.perform(get(s));
     }
 
     private Stream<Merchant> getMerchantsFromResponseJson(ResultActions result) throws java.io.IOException {
-        String content = result.andReturn().getResponse().getContentAsString();
-        List<Merchant> merchants = objectMapper.readValue(content, new TypeReference<List<Merchant>>() {
-        });
+        String content = result
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+
+        List<Merchant> merchants = objectMapper.readValue(content, new TypeReference<List<Merchant>>() {});
         return merchants.stream();
     }
 }

@@ -16,38 +16,44 @@ public class MerchantStepdefs {
     private String dbUrl;
     private Integer id;
     private Map response;
+    private final WebClient client;
 
     public MerchantStepdefs() {
         endpoint = System.getProperty("integration-endpoint", "http://localhost:8080");
         dbUrl = System.getProperty("integration-mysql", "jdbc:mysql://localhost:3306/cc_processing");
+        client = WebClient.create(endpoint);
     }
 
     @Given("a merchant")
     public void aMerchant() {
-        // Insert into db
-        MysqlDataSource dataSource = new MysqlDataSource();
-        dataSource.setURL(dbUrl);
-        dataSource.setUser("root");
-        dataSource.setPassword("password");
-        JdbcTemplate template = new JdbcTemplate(dataSource);
+        JdbcTemplate template = getJdbcTemplate();
         template.update("INSERT INTO merchant SET id=?, name=?", 1, "Test Merchant");
     }
 
     @When("I request it's information")
     public void iRequestItsInformation() {
-        // Query URL for merchant with id from previously inserted
-        WebClient client = WebClient.create(endpoint);
-        response = client
-                .get()
-                .uri("/api/merchant/1")
-                .retrieve()
-                .bodyToMono(Map.class)
-                .block();
+        response = getObjectForUrl("/api/merchant/1", Map.class);
     }
 
     @Then("the name is {string}")
     public void theNameIs(String name) {
-        // Response object name matches
         assertEquals(response.get("name"), name);
+    }
+
+    private Map getObjectForUrl(String uri, Class<Map> bodyType) {
+        return client
+                .get()
+                .uri(uri)
+                .retrieve()
+                .bodyToMono(bodyType)
+                .block();
+    }
+
+    private JdbcTemplate getJdbcTemplate() {
+        MysqlDataSource dataSource = new MysqlDataSource();
+        dataSource.setURL(dbUrl);
+        dataSource.setUser("root");
+        dataSource.setPassword("password");
+        return new JdbcTemplate(dataSource);
     }
 }

@@ -42,7 +42,7 @@ public class TestMerchant {
     @Test
     @Transactional
     public void testTableWithOneNamedMerchantReturnsFromRepository() {
-        jdbcTemplate.update("INSERT INTO merchant SET id=?, name=?", 1, "Test Merchant");
+        insertTestMerchant();
 
         Merchant merchant = merchantRepository.getOne(1);
 
@@ -51,7 +51,7 @@ public class TestMerchant {
 
     @Test
     public void testApiReturnsTestMerchantWhenQueriedForId1() {
-        jdbcTemplate.update("INSERT INTO merchant SET id=?, name=?", 1, "Test Merchant");
+        insertTestMerchant();
 
         Merchant test_merchant = new Merchant(1, "Test Merchant");
 
@@ -69,5 +69,9 @@ public class TestMerchant {
     @After
     public void tearDown() {
         jdbcTemplate.update("TRUNCATE merchant");
+    }
+
+    private int insertTestMerchant() {
+        return jdbcTemplate.update("INSERT INTO merchant SET id=?, name=?", 1, "Test Merchant");
     }
 }

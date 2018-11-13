@@ -86,7 +86,10 @@ dockerCompose {
 
 tasks.composeUp.dependsOn('docker')
 
-task integrationTest(type: Test, dependsOn: 'mysqlOnlyComposeUp') {
+task integrationTestSetup(dependsOn: 'mysqlOnlyComposeUp') {}
+task integrationTestTeardown(dependsOn: 'mysqlOnlyComposeDown') {}
+
+task integrationTest(type: Test, dependsOn: 'integrationTestSetup') {
     description = 'Runs integration tests.'
     group = 'verification'
 
@@ -94,13 +97,16 @@ task integrationTest(type: Test, dependsOn: 'mysqlOnlyComposeUp') {
     classpath = sourceSets.intTest.runtimeClasspath
     shouldRunAfter test
 }
-integrationTest.finalizedBy('mysqlOnlyComposeDown')
+integrationTest.finalizedBy('integrationTestTeardown')
 
 check.dependsOn integrationTest
 
-cucumberTest.mustRunAfter('mysqlOnlyComposeDown')
-cucumberTest.dependsOn('composeUp')
-cucumberTest.finalizedBy('composeDown')
+task cucumberTestSetup(dependsOn: 'composeUp') {}
+task cucumberTestTeardown(dependsOn: 'composeDown') {}
+cucumberTestSetup.mustRunAfter('integrationTestTeardown')
+
+cucumberTest.dependsOn('cucumberTestSetup')
+cucumberTest.finalizedBy('cucumberTestTeardown')
 cucumberTest.shouldRunAfter('integrationTest')
 
 check.dependsOn tasks.cucumberTest

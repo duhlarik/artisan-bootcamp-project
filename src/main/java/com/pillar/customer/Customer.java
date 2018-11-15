@@ -1,18 +1,18 @@
-package com.pillar.merchant;
+package com.pillar.customer;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
 
 @Entity
-public class Merchant {
+public class Customer {
     @Id
     private Integer id;
 
     private String name;
 
-    public Merchant() {}
+    public Customer() {}
 
-    public Merchant(Integer id, String name) {
+    public Customer(Integer id, String name) {
         this.id = id;
         this.name = name;
     }
@@ -42,6 +42,6 @@ public class Merchant {
         if (!getClass().isInstance(other)) {
             return false;
         }
-        return id.equals(((Merchant)other).getId());
+        return id.equals(((Customer)other).getId());
     }
 }

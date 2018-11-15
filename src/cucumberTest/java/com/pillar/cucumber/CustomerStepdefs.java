@@ -11,28 +11,28 @@ import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 
-public class MerchantStepdefs {
+public class CustomerStepdefs {
     private String endpoint;
     private String dbUrl;
     private Integer id;
     private Map response;
     private final WebClient client;
 
-    public MerchantStepdefs() {
+    public CustomerStepdefs() {
         endpoint = System.getProperty("integration-endpoint", "http://localhost:8080");
         dbUrl = System.getProperty("integration-mysql", "jdbc:mysql://localhost:3306/cc_processing");
         client = WebClient.create(endpoint);
     }
 
-    @Given("a merchant")
-    public void aMerchant() {
+    @Given("a customer")
+    public void aCustomer() {
         JdbcTemplate template = getJdbcTemplate();
-        template.update("INSERT INTO merchant SET id=?, name=?", 1, "Test Merchant");
+        template.update("INSERT INTO customer SET id=?, name=?", 1, "Test Customer");
     }
 
     @When("I request it's information")
     public void iRequestItsInformation() {
-        response = getObjectForUrl("/api/merchant/1", Map.class);
+        response = getObjectForUrl("/api/customer/1", Map.class);
     }
 
     @Then("the name is {string}")

@@ -1,7 +1,7 @@
 package com.pillar;
 
-import com.pillar.merchant.Merchant;
-import com.pillar.merchant.MerchantRepository;
+import com.pillar.customer.Customer;
+import com.pillar.customer.CustomerRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -12,23 +12,23 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/merchant")
-public class MerchantApiController {
-    private MerchantRepository repository;
+@RequestMapping("/api/customer")
+public class CustomerApiController {
+    private CustomerRepository repository;
 
-    public MerchantApiController(MerchantRepository repository) {
+    public CustomerApiController(CustomerRepository repository) {
         this.repository = repository;
     }
 
     @RequestMapping(method = {RequestMethod.GET})
-    public List<Merchant> getAll() {
+    public List<Customer> getAll() {
         return repository.findAll();
     }
 
     @RequestMapping(path = "/{id}", method = {RequestMethod.GET})
-    public ResponseEntity<Merchant> getMerchant(@PathVariable Integer id) {
+    public ResponseEntity<Customer> getCustomer(@PathVariable Integer id) {
         return repository.findById(id)
-                .map((merchant) -> new ResponseEntity<>(merchant, HttpStatus.OK))
+                .map((customer) -> new ResponseEntity<>(customer, HttpStatus.OK))
                 .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 }

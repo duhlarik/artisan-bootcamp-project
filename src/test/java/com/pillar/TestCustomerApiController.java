@@ -30,14 +30,14 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class TestCustomerApiController {
     private static final String API_MERCHANT_1 = "/api/merchant/1";
     private static final String API_ALL_MERCHANTS = "/api/merchant";
-    private static final String TEST_MERCHANT_NAME = "Test Customer";
-    private static final int TEST_MERCHANT_ID = 1;
+    private static final String TEST_CUSTOMER_NAME = "Test Customer";
+    private static final int TEST_CUSTOMER_ID = 1;
     private static final String API_MERCHANT_2 = "/api/merchant/2";
     private static final String JSON_NAME_FIELD = "$.name";
     private static final String JSON_ID_FIELD = "$.id";
-    private static final int INVALID_MERCHANT_ID = 0;
+    private static final int INVALID_CUSTOMER_ID = 0;
 
-    private MerchantApiController controller;
+    private CustomerApiController controller;
     private CustomerRepository repository;
     private MockMvc mockMvc;
     private Customer testCustomer;
@@ -47,11 +47,11 @@ public class TestCustomerApiController {
     @Before
     public void setUp() {
         repository = mock(CustomerRepository.class);
-        controller = new MerchantApiController(repository);
+        controller = new CustomerApiController(repository);
 
-        testCustomer = new Customer(TEST_MERCHANT_ID, TEST_MERCHANT_NAME);
+        testCustomer = new Customer(TEST_CUSTOMER_ID, TEST_CUSTOMER_NAME);
 
-        when(repository.findById(TEST_MERCHANT_ID)).thenReturn(Optional.of(testCustomer));
+        when(repository.findById(TEST_CUSTOMER_ID)).thenReturn(Optional.of(testCustomer));
 
         customerRepoList = new ArrayList<>(Collections.singletonList(testCustomer));
         when(repository.findAll()).then((invocation) -> customerRepoList);
@@ -61,81 +61,81 @@ public class TestCustomerApiController {
     }
 
     @Test
-    public void merchantApiControllerExists() {
+    public void customerApiControllerExists() {
         assertNotNull(controller);
     }
 
     @Test
-    public void merchantApiReturnsEmptyListIfNoMerchants() {
+    public void customerApiReturnsEmptyListIfNoCustomer() {
         customerRepoList.clear();
 
         assertEquals(0, controller.getAll().size());
     }
 
     @Test
-    public void merchantApiReturnsAListWithOneMerchantWhenTheRepositoryContainsOneMerchant() {
+    public void customerApiReturnsAListWithOneCustomerWhenTheRepositoryContainsOneCustomer() {
         assertEquals(1, controller.getAll().size());
     }
 
     @Test
-    public void whenAMerchant1IsRequestedIGetTheTestMerchant() {
-        ResponseEntity<Customer> merchantResponse = controller.getMerchant(TEST_MERCHANT_ID);
-        assertEquals(TEST_MERCHANT_ID, (int) extractIdFromMerchantResponse(merchantResponse));
+    public void whenACustomer1IsRequestedIGetTheTestCustomer() {
+        ResponseEntity<Customer> customerResponse = controller.getCustomer(TEST_CUSTOMER_ID);
+        assertEquals(TEST_CUSTOMER_ID, (int) extractIdFromCustomerResponse(customerResponse));
     }
 
     @Test
-    public void aGetRequestForMerchant1ReturnsStatusOK() throws Exception {
+    public void aGetRequestForCustomer1ReturnsStatusOK() throws Exception {
         queryApi(API_MERCHANT_1)
                 .andExpect(status().isOk());
     }
 
     @Test
-    public void aGetRequestForMerchant1ReturnsAMerchantWithTheNameTestMerchant() throws Exception {
+    public void aGetRequestForCustomer1ReturnsACustomerWithTheNameTestCustomer() throws Exception {
         queryApi(API_MERCHANT_1)
-                .andExpect(jsonPath(JSON_NAME_FIELD, is(TEST_MERCHANT_NAME)));
+                .andExpect(jsonPath(JSON_NAME_FIELD, is(TEST_CUSTOMER_NAME)));
     }
 
     @Test
-    public void aGetRequestForMerchant1ReturnsAMerchantWithTheId1() throws Exception {
+    public void aGetRequestForCustomer1ReturnsACustomerWithTheId1() throws Exception {
         queryApi(API_MERCHANT_1)
-                .andExpect(jsonPath(JSON_ID_FIELD, is(TEST_MERCHANT_ID)));
+                .andExpect(jsonPath(JSON_ID_FIELD, is(TEST_CUSTOMER_ID)));
     }
 
     @Test
-    public void aGetRequestForMerchant2ReturnsStatusNotFound() throws Exception {
+    public void aGetRequestForCustomer2ReturnsStatusNotFound() throws Exception {
         queryApi(API_MERCHANT_2)
                 .andExpect(status().isNotFound());
     }
 
     @Test
-    public void aGetRequestForAllMerchantsReturnsStatusOk() throws Exception {
+    public void aGetRequestForAllCustomersReturnsStatusOk() throws Exception {
         queryApi(API_ALL_MERCHANTS)
                 .andExpect(status().isOk());
     }
 
     @Test
-    public void aGetRequestForAllMerchantsContainsTheTestMerchant() throws Exception {
+    public void aGetRequestForAllCustomersContainsTheTestCustomer() throws Exception {
         ResultActions result = queryApi(API_ALL_MERCHANTS);
-        assertTrue(containsMerchantWithId(result, TEST_MERCHANT_ID));
+        assertTrue(containsCustomerWithId(result, TEST_CUSTOMER_ID));
     }
 
     private ResultActions queryApi(String s) throws Exception {
         return mockMvc.perform(get(s));
     }
 
-    private Integer extractIdFromMerchantResponse(ResponseEntity<Customer> merchantResponse) {
-        return Optional.ofNullable(merchantResponse.getBody())
+    private Integer extractIdFromCustomerResponse(ResponseEntity<Customer> customerResponse) {
+        return Optional.ofNullable(customerResponse.getBody())
                 .map(Customer::getId)
-                .orElse(INVALID_MERCHANT_ID);
+                .orElse(INVALID_CUSTOMER_ID);
     }
 
-    private boolean containsMerchantWithId(ResultActions result, int testMerchantId) throws IOException {
-        return getMerchantsFromResponseJson(result)
+    private boolean containsCustomerWithId(ResultActions result, int testCustomerId) throws IOException {
+        return getCustomersFromResponseJson(result)
                 .map(Customer::getId)
-                .anyMatch(id -> id == testMerchantId);
+                .anyMatch(id -> id == testCustomerId);
     }
 
-    private Stream<Customer> getMerchantsFromResponseJson(ResultActions result) throws IOException {
+    private Stream<Customer> getCustomersFromResponseJson(ResultActions result) throws IOException {
         String content = result
                 .andReturn()
                 .getResponse()

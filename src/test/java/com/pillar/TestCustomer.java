@@ -19,31 +19,31 @@ public class TestCustomer {
     }
 
     @Test
-    public void twoMerchantsAreEquivalentIfTheirIdsAreTheSame() {
-        Customer customer2 = new Customer(1, "Test Merchant2");
+    public void twoCustomersAreEquivalentIfTheirIdsAreTheSame() {
+        Customer customer2 = new Customer(1, "Test Customer2");
 
         assertEquals(customer1, customer2);
     }
 
     @Test
-    public void twoMerchantsAreNotEqualIfTheirIdsAreDifferent() {
-        Customer customer2 = new Customer(2, "Test Merchant2");
+    public void twoCustomersAreNotEqualIfTheirIdsAreDifferent() {
+        Customer customer2 = new Customer(2, "Test Customer2");
 
         assertNotEquals(customer1, customer2);
     }
 
     @Test
-    public void aMerchantIsNotEqualToNull() {
+    public void aCustomerIsNotEqualToNull() {
         assertNotEquals(customer1, null);
     }
 
     @Test
-    public void aMerchantIsEqualToItself() {
+    public void aCustomerIsEqualToItself() {
         assertEquals(customer1, customer1);
     }
 
     @Test
-    public void aMerchantIsNotEqualToAnotherObjectOfADifferentClass() {
+    public void aCustomerIsNotEqualToAnotherObjectOfADifferentClass() {
         assertNotEquals(customer1, new ArrayList());
     }
 }

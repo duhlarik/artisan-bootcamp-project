@@ -28,11 +28,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 
 public class TestCustomerApiController {
-    private static final String API_MERCHANT_1 = "/api/customer/1";
-    private static final String API_ALL_MERCHANTS = "/api/customer";
+    private static final String API_CUSTOMER_1 = "/api/customer/1";
+    private static final String API_ALL_CUSTOMERS = "/api/customer";
     private static final String TEST_CUSTOMER_NAME = "Test Customer";
     private static final int TEST_CUSTOMER_ID = 1;
-    private static final String API_MERCHANT_2 = "/api/customer/2";
+    private static final String API_CUSTOMER_2 = "/api/customer/2";
     private static final String JSON_NAME_FIELD = "$.name";
     private static final String JSON_ID_FIELD = "$.id";
     private static final int INVALID_CUSTOMER_ID = 0;
@@ -85,37 +85,37 @@ public class TestCustomerApiController {
 
     @Test
     public void aGetRequestForCustomer1ReturnsStatusOK() throws Exception {
-        queryApi(API_MERCHANT_1)
+        queryApi(API_CUSTOMER_1)
                 .andExpect(status().isOk());
     }
 
     @Test
     public void aGetRequestForCustomer1ReturnsACustomerWithTheNameTestCustomer() throws Exception {
-        queryApi(API_MERCHANT_1)
+        queryApi(API_CUSTOMER_1)
                 .andExpect(jsonPath(JSON_NAME_FIELD, is(TEST_CUSTOMER_NAME)));
     }
 
     @Test
     public void aGetRequestForCustomer1ReturnsACustomerWithTheId1() throws Exception {
-        queryApi(API_MERCHANT_1)
+        queryApi(API_CUSTOMER_1)
                 .andExpect(jsonPath(JSON_ID_FIELD, is(TEST_CUSTOMER_ID)));
     }
 
     @Test
     public void aGetRequestForCustomer2ReturnsStatusNotFound() throws Exception {
-        queryApi(API_MERCHANT_2)
+        queryApi(API_CUSTOMER_2)
                 .andExpect(status().isNotFound());
     }
 
     @Test
     public void aGetRequestForAllCustomersReturnsStatusOk() throws Exception {
-        queryApi(API_ALL_MERCHANTS)
+        queryApi(API_ALL_CUSTOMERS)
                 .andExpect(status().isOk());
     }
 
     @Test
     public void aGetRequestForAllCustomersContainsTheTestCustomer() throws Exception {
-        ResultActions result = queryApi(API_ALL_MERCHANTS);
+        ResultActions result = queryApi(API_ALL_CUSTOMERS);
         assertTrue(containsCustomerWithId(result, TEST_CUSTOMER_ID));
     }
 

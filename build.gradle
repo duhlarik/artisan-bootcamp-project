@@ -96,6 +96,7 @@ task integrationTest(type: Test, dependsOn: 'integrationTestSetup') {
     testClassesDirs = sourceSets.intTest.output.classesDirs
     classpath = sourceSets.intTest.runtimeClasspath
     shouldRunAfter test
+    inputs.file(file('docker-compose.yml'))
 }
 integrationTest.finalizedBy('integrationTestTeardown')
 
@@ -108,5 +109,6 @@ cucumberTestSetup.mustRunAfter('integrationTestTeardown')
 cucumberTest.dependsOn('cucumberTestSetup')
 cucumberTest.finalizedBy('cucumberTestTeardown')
 cucumberTest.shouldRunAfter('integrationTest')
+cucumberTest.inputs.file(file('docker-compose.yml'))
 
 check.dependsOn tasks.cucumberTest

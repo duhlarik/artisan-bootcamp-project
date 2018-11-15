@@ -2,8 +2,8 @@ package com.pillar;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.pillar.merchant.Customer;
-import com.pillar.merchant.CustomerRepository;
+import com.pillar.customer.Customer;
+import com.pillar.customer.CustomerRepository;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.http.ResponseEntity;
@@ -28,11 +28,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 
 public class TestCustomerApiController {
-    private static final String API_MERCHANT_1 = "/api/merchant/1";
-    private static final String API_ALL_MERCHANTS = "/api/merchant";
+    private static final String API_MERCHANT_1 = "/api/customer/1";
+    private static final String API_ALL_MERCHANTS = "/api/customer";
     private static final String TEST_CUSTOMER_NAME = "Test Customer";
     private static final int TEST_CUSTOMER_ID = 1;
-    private static final String API_MERCHANT_2 = "/api/merchant/2";
+    private static final String API_MERCHANT_2 = "/api/customer/2";
     private static final String JSON_NAME_FIELD = "$.name";
     private static final String JSON_ID_FIELD = "$.id";
     private static final int INVALID_CUSTOMER_ID = 0;

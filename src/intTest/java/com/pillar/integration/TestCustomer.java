@@ -1,7 +1,7 @@
 package com.pillar.integration;
 
-import com.pillar.merchant.Customer;
-import com.pillar.merchant.CustomerRepository;
+import com.pillar.customer.Customer;
+import com.pillar.customer.CustomerRepository;
 import org.junit.After;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -61,7 +61,7 @@ public class TestCustomer {
         WebClient client = WebClient.create("http://localhost:" + randomServerPort);
         Customer response = client
                 .get()
-                .uri("/api/merchant/1")
+                .uri("/api/customer/1")
                 .retrieve()
                 .bodyToMono(Customer.class)
                 .block();

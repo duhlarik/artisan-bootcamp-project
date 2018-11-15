@@ -1,6 +1,6 @@
 package com.pillar;
 
-import com.pillar.merchant.Customer;
+import com.pillar.customer.Customer;
 import org.junit.Before;
 import org.junit.Test;
 

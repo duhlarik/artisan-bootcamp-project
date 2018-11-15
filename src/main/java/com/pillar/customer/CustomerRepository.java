@@ -1,4 +1,4 @@
-package com.pillar.merchant;
+package com.pillar.customer;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 

@@ -32,7 +32,7 @@ public class CustomerStepdefs {
 
     @When("I request it's information")
     public void iRequestItsInformation() {
-        response = getObjectForUrl("/api/merchant/1", Map.class);
+        response = getObjectForUrl("/api/customer/1", Map.class);
     }
 
     @Then("the name is {string}")

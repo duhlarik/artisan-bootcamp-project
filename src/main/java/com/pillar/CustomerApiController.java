@@ -1,7 +1,7 @@
 package com.pillar;
 
-import com.pillar.merchant.Customer;
-import com.pillar.merchant.CustomerRepository;
+import com.pillar.customer.Customer;
+import com.pillar.customer.CustomerRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/merchant")
+@RequestMapping("/api/customer")
 public class CustomerApiController {
     private CustomerRepository repository;
 

@@ -1,8 +1,7 @@
-package com.pillar.merchant;
+package com.pillar.customer;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
-import javax.persistence.Table;
 
 @Entity
 public class Customer {

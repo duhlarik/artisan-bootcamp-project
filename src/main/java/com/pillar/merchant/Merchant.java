@@ -2,8 +2,10 @@ package com.pillar.merchant;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.Table;
 
 @Entity
+@Table(name="customer")
 public class Merchant {
     @Id
     private Integer id;

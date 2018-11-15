@@ -71,10 +71,10 @@ public class TestMerchant {
 
     @After
     public void tearDown() {
-        jdbcTemplate.update("TRUNCATE merchant");
+        jdbcTemplate.update("TRUNCATE customer");
     }
 
     private int insertTestMerchant() {
-        return jdbcTemplate.update("INSERT INTO merchant SET id=?, name=?", TEST_MERCHANT_ID, TEST_MERCHANT_NAME);
+        return jdbcTemplate.update("INSERT INTO customer SET id=?, name=?", TEST_MERCHANT_ID, TEST_MERCHANT_NAME);
     }
 }

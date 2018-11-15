@@ -36,7 +36,7 @@ public class TestCustomer {
     int randomServerPort;
 
     @Test
-    public void testEmptyMerchantTableHasNoRecords() {
+    public void testEmptyCustomerTableHasNoRecords() {
         List<Customer> customers = customerRepository.findAll();
 
         assertEquals(0, customers.size());
@@ -44,8 +44,8 @@ public class TestCustomer {
 
     @Test
     @Transactional
-    public void testTableWithOneNamedMerchantReturnsFromRepository() {
-        insertTestMerchant();
+    public void testTableWithOneNamedCustomerReturnsFromRepository() {
+        insertTestCustomer();
 
         Customer customer = customerRepository.getOne(TEST_CUSTOMER_ID);
 
@@ -53,8 +53,8 @@ public class TestCustomer {
     }
 
     @Test
-    public void testApiReturnsTestMerchantWhenQueriedForId1() {
-        insertTestMerchant();
+    public void testApiReturnsTestCustomerWhenQueriedForId1() {
+        insertTestCustomer();
 
         Customer test_customer = new Customer(TEST_CUSTOMER_ID, TEST_CUSTOMER_NAME);
 
@@ -74,7 +74,7 @@ public class TestCustomer {
         jdbcTemplate.update("TRUNCATE customer");
     }
 
-    private int insertTestMerchant() {
+    private int insertTestCustomer() {
         return jdbcTemplate.update("INSERT INTO customer SET id=?, name=?", TEST_CUSTOMER_ID, TEST_CUSTOMER_NAME);
     }
 }

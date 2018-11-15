@@ -1,7 +1,7 @@
 package com.pillar.integration;
 
-import com.pillar.merchant.Merchant;
-import com.pillar.merchant.MerchantRepository;
+import com.pillar.merchant.Customer;
+import com.pillar.merchant.CustomerRepository;
 import org.junit.After;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -21,13 +21,13 @@ import static org.junit.Assert.assertEquals;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @Rollback
 @RunWith(SpringRunner.class)
-public class TestMerchant {
+public class TestCustomer {
 
-    private static final String TEST_MERCHANT_NAME = "Test Merchant";
-    private static final int TEST_MERCHANT_ID = 1;
+    private static final String TEST_CUSTOMER_NAME = "Test Customer";
+    private static final int TEST_CUSTOMER_ID = 1;
 
     @Autowired
-    MerchantRepository merchantRepository;
+    CustomerRepository customerRepository;
 
     @Autowired
     JdbcTemplate jdbcTemplate;
@@ -37,9 +37,9 @@ public class TestMerchant {
 
     @Test
     public void testEmptyMerchantTableHasNoRecords() {
-        List<Merchant> merchants = merchantRepository.findAll();
+        List<Customer> customers = customerRepository.findAll();
 
-        assertEquals(0, merchants.size());
+        assertEquals(0, customers.size());
     }
 
     @Test
@@ -47,26 +47,26 @@ public class TestMerchant {
     public void testTableWithOneNamedMerchantReturnsFromRepository() {
         insertTestMerchant();
 
-        Merchant merchant = merchantRepository.getOne(TEST_MERCHANT_ID);
+        Customer customer = customerRepository.getOne(TEST_CUSTOMER_ID);
 
-        assertEquals(TEST_MERCHANT_NAME, merchant.getName());
+        assertEquals(TEST_CUSTOMER_NAME, customer.getName());
     }
 
     @Test
     public void testApiReturnsTestMerchantWhenQueriedForId1() {
         insertTestMerchant();
 
-        Merchant test_merchant = new Merchant(TEST_MERCHANT_ID, TEST_MERCHANT_NAME);
+        Customer test_customer = new Customer(TEST_CUSTOMER_ID, TEST_CUSTOMER_NAME);
 
         WebClient client = WebClient.create("http://localhost:" + randomServerPort);
-        Merchant response = client
+        Customer response = client
                 .get()
                 .uri("/api/merchant/1")
                 .retrieve()
-                .bodyToMono(Merchant.class)
+                .bodyToMono(Customer.class)
                 .block();
 
-        assertEquals(test_merchant, response);
+        assertEquals(test_customer, response);
     }
 
     @After
@@ -75,6 +75,6 @@ public class TestMerchant {
     }
 
     private int insertTestMerchant() {
-        return jdbcTemplate.update("INSERT INTO customer SET id=?, name=?", TEST_MERCHANT_ID, TEST_MERCHANT_NAME);
+        return jdbcTemplate.update("INSERT INTO customer SET id=?, name=?", TEST_CUSTOMER_ID, TEST_CUSTOMER_NAME);
     }
 }

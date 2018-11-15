@@ -2,8 +2,8 @@ package com.pillar;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.pillar.merchant.Merchant;
-import com.pillar.merchant.MerchantRepository;
+import com.pillar.merchant.Customer;
+import com.pillar.merchant.CustomerRepository;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.http.ResponseEntity;
@@ -27,10 +27,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 
-public class TestMerchantApiController {
+public class TestCustomerApiController {
     private static final String API_MERCHANT_1 = "/api/merchant/1";
     private static final String API_ALL_MERCHANTS = "/api/merchant";
-    private static final String TEST_MERCHANT_NAME = "Test Merchant";
+    private static final String TEST_MERCHANT_NAME = "Test Customer";
     private static final int TEST_MERCHANT_ID = 1;
     private static final String API_MERCHANT_2 = "/api/merchant/2";
     private static final String JSON_NAME_FIELD = "$.name";
@@ -38,23 +38,23 @@ public class TestMerchantApiController {
     private static final int INVALID_MERCHANT_ID = 0;
 
     private MerchantApiController controller;
-    private MerchantRepository repository;
+    private CustomerRepository repository;
     private MockMvc mockMvc;
-    private Merchant testMerchant;
-    private List<Merchant> merchantRepoList;
+    private Customer testCustomer;
+    private List<Customer> customerRepoList;
     private ObjectMapper objectMapper;
 
     @Before
     public void setUp() {
-        repository = mock(MerchantRepository.class);
+        repository = mock(CustomerRepository.class);
         controller = new MerchantApiController(repository);
 
-        testMerchant = new Merchant(TEST_MERCHANT_ID, TEST_MERCHANT_NAME);
+        testCustomer = new Customer(TEST_MERCHANT_ID, TEST_MERCHANT_NAME);
 
-        when(repository.findById(TEST_MERCHANT_ID)).thenReturn(Optional.of(testMerchant));
+        when(repository.findById(TEST_MERCHANT_ID)).thenReturn(Optional.of(testCustomer));
 
-        merchantRepoList = new ArrayList<>(Collections.singletonList(testMerchant));
-        when(repository.findAll()).then((invocation) -> merchantRepoList);
+        customerRepoList = new ArrayList<>(Collections.singletonList(testCustomer));
+        when(repository.findAll()).then((invocation) -> customerRepoList);
 
         mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
         objectMapper = new ObjectMapper();
@@ -67,7 +67,7 @@ public class TestMerchantApiController {
 
     @Test
     public void merchantApiReturnsEmptyListIfNoMerchants() {
-        merchantRepoList.clear();
+        customerRepoList.clear();
 
         assertEquals(0, controller.getAll().size());
     }
@@ -79,7 +79,7 @@ public class TestMerchantApiController {
 
     @Test
     public void whenAMerchant1IsRequestedIGetTheTestMerchant() {
-        ResponseEntity<Merchant> merchantResponse = controller.getMerchant(TEST_MERCHANT_ID);
+        ResponseEntity<Customer> merchantResponse = controller.getMerchant(TEST_MERCHANT_ID);
         assertEquals(TEST_MERCHANT_ID, (int) extractIdFromMerchantResponse(merchantResponse));
     }
 
@@ -123,26 +123,26 @@ public class TestMerchantApiController {
         return mockMvc.perform(get(s));
     }
 
-    private Integer extractIdFromMerchantResponse(ResponseEntity<Merchant> merchantResponse) {
+    private Integer extractIdFromMerchantResponse(ResponseEntity<Customer> merchantResponse) {
         return Optional.ofNullable(merchantResponse.getBody())
-                .map(Merchant::getId)
+                .map(Customer::getId)
                 .orElse(INVALID_MERCHANT_ID);
     }
 
     private boolean containsMerchantWithId(ResultActions result, int testMerchantId) throws IOException {
         return getMerchantsFromResponseJson(result)
-                .map(Merchant::getId)
+                .map(Customer::getId)
                 .anyMatch(id -> id == testMerchantId);
     }
 
-    private Stream<Merchant> getMerchantsFromResponseJson(ResultActions result) throws IOException {
+    private Stream<Customer> getMerchantsFromResponseJson(ResultActions result) throws IOException {
         String content = result
                 .andReturn()
                 .getResponse()
                 .getContentAsString();
 
-        List<Merchant> merchants = objectMapper.readValue(content, new TypeReference<List<Merchant>>() {
+        List<Customer> customers = objectMapper.readValue(content, new TypeReference<List<Customer>>() {
         });
-        return merchants.stream();
+        return customers.stream();
     }
 }

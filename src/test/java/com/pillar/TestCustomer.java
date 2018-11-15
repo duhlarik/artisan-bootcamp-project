@@ -1,6 +1,6 @@
 package com.pillar;
 
-import com.pillar.merchant.Merchant;
+import com.pillar.merchant.Customer;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -9,41 +9,41 @@ import java.util.ArrayList;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 
-public class TestMerchant {
+public class TestCustomer {
 
-    private Merchant merchant1;
+    private Customer customer1;
 
     @Before
     public void setUp() {
-        merchant1 = new Merchant(1, "Test Merchant");
+        customer1 = new Customer(1, "Test Customer");
     }
 
     @Test
     public void twoMerchantsAreEquivalentIfTheirIdsAreTheSame() {
-        Merchant merchant2 = new Merchant(1, "Test Merchant2");
+        Customer customer2 = new Customer(1, "Test Merchant2");
 
-        assertEquals(merchant1, merchant2);
+        assertEquals(customer1, customer2);
     }
 
     @Test
     public void twoMerchantsAreNotEqualIfTheirIdsAreDifferent() {
-        Merchant merchant2 = new Merchant(2, "Test Merchant2");
+        Customer customer2 = new Customer(2, "Test Merchant2");
 
-        assertNotEquals(merchant1, merchant2);
+        assertNotEquals(customer1, customer2);
     }
 
     @Test
     public void aMerchantIsNotEqualToNull() {
-        assertNotEquals(merchant1, null);
+        assertNotEquals(customer1, null);
     }
 
     @Test
     public void aMerchantIsEqualToItself() {
-        assertEquals(merchant1, merchant1);
+        assertEquals(customer1, customer1);
     }
 
     @Test
     public void aMerchantIsNotEqualToAnotherObjectOfADifferentClass() {
-        assertNotEquals(merchant1, new ArrayList());
+        assertNotEquals(customer1, new ArrayList());
     }
 }

@@ -1,0 +1,12 @@
+language: java
+install: true
+
+services:
+  - docker
+
+jdk:
+  - oraclejdk8
+
+script:
+  - ./gradlew build --scan -s
+

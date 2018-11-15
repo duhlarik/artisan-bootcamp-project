@@ -24,10 +24,10 @@ public class MerchantStepdefs {
         client = WebClient.create(endpoint);
     }
 
-    @Given("a merchant")
+    @Given("a customer")
     public void aMerchant() {
         JdbcTemplate template = getJdbcTemplate();
-        template.update("INSERT INTO merchant SET id=?, name=?", 1, "Test Merchant");
+        template.update("INSERT INTO customer SET id=?, name=?", 1, "Test Customer");
     }
 
     @When("I request it's information")

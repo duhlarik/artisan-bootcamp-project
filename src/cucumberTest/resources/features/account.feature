@@ -6,4 +6,3 @@ Feature: Account Creation
     When a request is made to create an account for this cardholder
     Then a new account is created and a new card number is issued to that account and returned
     And a credit limit of 10,000 is assigned
-

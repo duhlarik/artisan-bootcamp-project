@@ -7,23 +7,23 @@ public class Account {
     @Id
     private final int id;
 
-    private final String card_number;
-    private final double credit_limit;
+    private final String cardNumber;
+    private final double creditLimit;
     private final boolean active;
 
-    public Account(int id, double credit_limit, String card_number, boolean active) {
+    public Account(int id, double creditLimit, String cardNumber, boolean active) {
         this.id = id;
-        this.credit_limit = credit_limit;
-        this.card_number = card_number;
+        this.creditLimit = creditLimit;
+        this.cardNumber = cardNumber;
         this.active = active;
     }
 
     public double getCreditLimit() {
-        return credit_limit;
+        return creditLimit;
     }
 
     public String getCardNumber() {
-        return card_number;
+        return cardNumber;
     }
 
     public boolean isActive() {

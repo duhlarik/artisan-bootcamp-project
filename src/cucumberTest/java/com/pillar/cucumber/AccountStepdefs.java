@@ -24,7 +24,8 @@ public class AccountStepdefs {
     private String ssn;
     private String businessName;
 
-    private ClientResponse response;
+    private HttpStatus status;
+    private Map body;
 
     public AccountStepdefs() {
         final String endpoint = System.getProperty("integration-endpoint", "http://localhost:8080");
@@ -45,27 +46,28 @@ public class AccountStepdefs {
         payload.put("ssn", ssn);
         payload.put("business_name", businessName);
 
-        response = client
+        final ClientResponse response = client
                 .post()
                 .uri("/api/account")
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(BodyInserters.fromObject(payload))
                 .exchange()
                 .block();
+
+        status = response.statusCode();
+        body = response.bodyToMono(Map.class).block();
     }
 
     @Then("a new account is created and a new card number is issued to that account and returned")
     public void aNewAccountIsCreated() {
-        assertEquals(HttpStatus.CREATED, response.statusCode());
-        final Map payload = response.bodyToMono(Map.class).block();
-        assertTrue(payload.containsKey("card_number"));
-        assertNotNull(payload.get("card_number"));
+        assertEquals(HttpStatus.CREATED, status);
+        assertTrue(body.containsKey("cardNumber"));
+        assertNotNull(body.get("cardNumber"));
     }
 
     @And("a credit limit of 10,000 is assigned")
     public void aCreditLimitIsAssigned() {
-        final Map payload = response.bodyToMono(Map.class).block();
-        assertTrue(payload.containsKey("credit_limit"));
-        assertEquals(10000, payload.get("credit_limit"));
+        assertTrue(body.containsKey("creditLimit"));
+        assertEquals(10000.0, body.get("creditLimit"));
     }
 }

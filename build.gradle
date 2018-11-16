@@ -85,6 +85,7 @@ dockerCompose {
 }
 
 tasks.composeUp.dependsOn('docker')
+tasks.composeUp.dependsOn(':fake-bank-service:docker')
 
 task integrationTestSetup(dependsOn: 'mysqlOnlyComposeUp') {}
 task integrationTestTeardown(dependsOn: 'mysqlOnlyComposeDown') {}

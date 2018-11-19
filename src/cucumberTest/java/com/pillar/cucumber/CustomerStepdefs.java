@@ -20,7 +20,7 @@ public class CustomerStepdefs {
 
     public CustomerStepdefs() {
         endpoint = System.getProperty("integration-endpoint", "http://localhost:8080");
-        dbUrl = System.getProperty("integration-mysql", "jdbc:mysql://localhost:3306/cc_processing");
+        dbUrl = System.getProperty("integration-mysql", "jdbc:mysql://localhost:3316/cc_processing");
         client = WebClient.create(endpoint);
     }
 

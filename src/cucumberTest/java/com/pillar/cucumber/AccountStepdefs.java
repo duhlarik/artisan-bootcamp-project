@@ -59,7 +59,7 @@ public class AccountStepdefs {
     @And("a credit limit of 10,000 is assigned")
     public void aCreditLimitIsAssigned() {
         assertTrue(body.containsKey("creditLimit"));
-        assertEquals(10000.0, body.get("creditLimit"));
+        assertEquals(10000, body.get("creditLimit"));
     }
 
     @Then("the request should fail and return an Error")

@@ -1,5 +1,7 @@
 package com.pillar.account;
 
+import com.pillar.cardholder.Cardholder;
+
 import javax.persistence.Id;
 import java.util.Objects;
 
@@ -8,17 +10,17 @@ public class Account {
     private final int id;
 
     private final String cardNumber;
-    private final double creditLimit;
+    private final int creditLimit;
     private final boolean active;
 
-    public Account(int id, double creditLimit, String cardNumber, boolean active) {
+    public Account(int id, int creditLimit, String cardNumber, boolean active) {
         this.id = id;
         this.creditLimit = creditLimit;
         this.cardNumber = cardNumber;
         this.active = active;
     }
 
-    public double getCreditLimit() {
+    public int getCreditLimit() {
         return creditLimit;
     }
 

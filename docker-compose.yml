@@ -20,4 +20,4 @@ services:
   fake-bank-service:
     image: 'com.pillar/fake-bank-service'
     ports:
-    - "5000:8080"
+      - "5000:8080"

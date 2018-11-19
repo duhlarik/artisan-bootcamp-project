@@ -29,8 +29,8 @@ group = "com.pillar"
 sourceCompatibility = '1.8'
 targetCompatibility = '1.8'
 
-Integer integrationTestPort = 8080
-String integrationTestBaseUrl = "http://localhost:${integrationTestPort}"
+String integrationTestBaseUrl = "http://localhost:8080"
+String fakeServiceBaseUrl = "http://localhost:5000"
 String integrationTestMysql = "jdbc:mysql://localhost:3316/cc_processing"
 
 addCucumberSuite 'cucumberTest'
@@ -38,7 +38,8 @@ cucumberTest {
     stepDefinitionRoots = ['com.pillar']
     systemProperties = [
             "integration-endpoint": integrationTestBaseUrl,
-            "integration-mysql": integrationTestMysql
+            "integration-mysql": integrationTestMysql,
+            "fake-service-base-url": fakeServiceBaseUrl
     ]
 }
 

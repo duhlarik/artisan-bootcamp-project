@@ -41,6 +41,33 @@ public class AccountStepdefs {
 
     @When("a request is made to create an account for this cardholder")
     public void aRequestIsMadeToCreateAnAccount() {
+        requestCreateAccount();
+    }
+
+    @And("a second request is made to create an account for this cardholder at the same business customer")
+    public void aSecondRequestIsMadeToCreateAnAccount() {
+        requestCreateAccount();
+    }
+
+    @Then("a new account is created and a new card number is issued to that account and returned")
+    public void aNewAccountIsCreated() {
+        assertEquals(HttpStatus.CREATED, status);
+        assertTrue(body.containsKey("cardNumber"));
+        assertNotNull(body.get("cardNumber"));
+    }
+
+    @And("a credit limit of 10,000 is assigned")
+    public void aCreditLimitIsAssigned() {
+        assertTrue(body.containsKey("creditLimit"));
+        assertEquals(10000.0, body.get("creditLimit"));
+    }
+
+    @Then("the request should fail and return an Error")
+    public void requestShouldFail() {
+        assertEquals(HttpStatus.FORBIDDEN, status);
+    }
+
+    private void requestCreateAccount(){
         final HashMap<String, String> payload = new HashMap<>();
         payload.put("card_holder_name", cardHolderName);
         payload.put("ssn", ssn);
@@ -56,18 +83,5 @@ public class AccountStepdefs {
 
         status = response.statusCode();
         body = response.bodyToMono(Map.class).block();
-    }
-
-    @Then("a new account is created and a new card number is issued to that account and returned")
-    public void aNewAccountIsCreated() {
-        assertEquals(HttpStatus.CREATED, status);
-        assertTrue(body.containsKey("cardNumber"));
-        assertNotNull(body.get("cardNumber"));
-    }
-
-    @And("a credit limit of 10,000 is assigned")
-    public void aCreditLimitIsAssigned() {
-        assertTrue(body.containsKey("creditLimit"));
-        assertEquals(10000.0, body.get("creditLimit"));
     }
 }

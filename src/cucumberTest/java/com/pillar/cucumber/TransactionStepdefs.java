@@ -7,6 +7,7 @@ import cucumber.api.java.en.Given;
 import cucumber.api.java.en.Then;
 import cucumber.api.java.en.When;
 
+import java.util.Date;
 import java.util.HashMap;
 import  java.util.UUID;
 
@@ -23,16 +24,21 @@ import static org.junit.Assert.assertEquals;
 public class TransactionStepdefs {
     private String dbUrl;
     private String endpoint;
+    private String fakeServiceUrl;
     private ClientResponse response;
     private final WebClient client;
+    private final WebClient fakeServiceClient;
     private Account account;
     private UUID activeCreditCardNumber;
 
 
+
     public TransactionStepdefs() {
+        dbUrl = System.getProperty("integration-mysql", "jdbc:mysql://localhost:3316/cc_processing");
         endpoint = System.getProperty("integration-endpoint", "http://localhost:8080");
-        dbUrl = System.getProperty("integration-mysql", "jdbc:mysql://localhost:3306/cc_processing");
+        fakeServiceUrl = System.getProperty("fake-service-base-url", "http://localhost:5000");
         client = WebClient.create(endpoint);
+        fakeServiceClient = WebClient.create(fakeServiceUrl);
         activeCreditCardNumber = randomUUID();
     }
 
@@ -46,13 +52,15 @@ public class TransactionStepdefs {
 
     @When("a purchase transaction request is made,")
     public void aPurchaseTransactionRequestIsMade() {
-        HashMap<String, String> transaction = new HashMap<>();
-        transaction.put("amount", "2.00");
-        transaction.put("creditCardNumber", activeCreditCardNumber.toString());
-        transaction.put("creditLimit", "5.00");
-        response =  client
+        HashMap<String, Object> transaction = new HashMap<>();
+        transaction.put("cardNumber", activeCreditCardNumber.toString());
+        transaction.put("amount", 2.00);
+        transaction.put("creditLimit", 10000);
+        transaction.put("dateOfTransaction", new Date());
+        transaction.put("customer", "Foobar");
+        response =  fakeServiceClient
                 .post()
-                .uri("/transaction")
+                .uri("/api/transaction")
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(BodyInserters.fromObject(transaction))
                 .exchange()
@@ -61,7 +69,7 @@ public class TransactionStepdefs {
 
     @Then("success response is returned")
     public void successResponseIsReturned() {
-        assertEquals(HttpStatus.NOT_FOUND, response.statusCode());
+        assertEquals(HttpStatus.CREATED, response.statusCode());
     }
 
     private JdbcTemplate getJdbcTemplate() {

@@ -12,4 +12,3 @@ Feature: Account Creation
     When a request is made to create an account for this cardholder
     And a second request is made to create an account for this cardholder at the same business customer
     Then the request should fail and return an Error
-

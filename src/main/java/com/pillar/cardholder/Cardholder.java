@@ -1,8 +1,10 @@
 package com.pillar.cardholder;
 
+import javax.persistence.Entity;
 import javax.persistence.Id;
 import java.util.Objects;
 
+@Entity
 public class Cardholder {
     @Id
     private final int id;

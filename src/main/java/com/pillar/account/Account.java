@@ -2,9 +2,13 @@ package com.pillar.account;
 
 import com.pillar.cardholder.Cardholder;
 
+import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import java.util.Objects;
 
+@Entity
 public class Account {
     @Id
     private final int id;
@@ -13,6 +17,8 @@ public class Account {
     private final int creditLimit;
     private final boolean active;
 
+    @ManyToOne
+    @JoinColumn(name = "cardholder_id")
     private Cardholder cardholder;
 
     public Account(int id, int creditLimit, String cardNumber, boolean active, Cardholder cardholder) {

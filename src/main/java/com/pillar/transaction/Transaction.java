@@ -1,5 +1,7 @@
 package com.pillar.transaction;
 
+import io.micrometer.core.lang.Nullable;
+
 import java.util.Date;
 
 public class Transaction {
@@ -8,14 +10,16 @@ public class Transaction {
     private Double amount;
     private Date dateOfTransaction;
     private Integer customerId;
+    private Double creditLimit;
 
     public Transaction() {}
 
-    public Transaction(String cardNumber, Double amount, Date dateOfTransaction, Integer customerId) {
+    public Transaction(String cardNumber, Double amount, Date dateOfTransaction, Integer customerId, @Nullable Double creditLimit) {
         this.cardNumber = cardNumber;
         this.amount = amount;
         this.dateOfTransaction = dateOfTransaction;
         this.customerId = customerId;
+        this.creditLimit = creditLimit;
     }
 
     public String getCardNumber() {
@@ -48,5 +52,13 @@ public class Transaction {
 
     public void setCustomerId(Integer customerId) {
         this.customerId = customerId;
+    }
+
+    public Double getCreditLimit() {
+        return creditLimit;
+    }
+
+    public void setCreditLimit(Double creditLimit) {
+        this.creditLimit = creditLimit;
     }
 }

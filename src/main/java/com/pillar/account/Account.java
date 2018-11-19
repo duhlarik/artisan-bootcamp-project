@@ -7,26 +7,39 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import java.util.Objects;
+import java.util.UUID;
 
 @Entity
 public class Account {
     @Id
-    private final int id;
+    private Integer id;
 
-    private final String cardNumber;
-    private final int creditLimit;
-    private final boolean active;
+    private String cardNumber;
+    private int creditLimit;
+    private boolean active;
 
     @ManyToOne
     @JoinColumn(name = "cardholder_id")
     private Cardholder cardholder;
+
+    public Account() {
+
+    }
+
+    public Account(Cardholder cardholder) {
+        this.id = null;
+        this.creditLimit = 10000;
+        this.cardNumber = UUID.randomUUID().toString();
+        this.active = true;
+        this.cardholder = cardholder;
+    }
 
     public Account(int id, int creditLimit, String cardNumber, boolean active, Cardholder cardholder) {
         this.id = id;
         this.creditLimit = creditLimit;
         this.cardNumber = cardNumber;
         this.active = active;
-        this.cardholder =  cardholder;
+        this.cardholder = cardholder;
     }
 
     public int getCreditLimit() {

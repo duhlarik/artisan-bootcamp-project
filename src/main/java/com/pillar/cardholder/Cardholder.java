@@ -7,9 +7,13 @@ import java.util.Objects;
 @Entity
 public class Cardholder {
     @Id
-    private final int id;
-    private final String ssn;
-    private final String name;
+    private Integer id;
+    private String ssn;
+    private String name;
+
+    public Cardholder() {
+
+    }
 
     public Cardholder(int id, String ssn, String name) {
         this.id = id;
@@ -30,7 +34,7 @@ public class Cardholder {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Cardholder that = (Cardholder) o;
-        return id == that.id;
+        return id.equals(that.id);
     }
 
     @Override

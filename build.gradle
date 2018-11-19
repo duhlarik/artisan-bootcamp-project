@@ -36,6 +36,7 @@ String integrationTestMysql = "jdbc:mysql://localhost:3316/cc_processing"
 addCucumberSuite 'cucumberTest'
 cucumberTest {
     stepDefinitionRoots = ['com.pillar']
+    tags = ["not @wip"]
     systemProperties = [
             "integration-endpoint": integrationTestBaseUrl,
             "integration-mysql": integrationTestMysql,

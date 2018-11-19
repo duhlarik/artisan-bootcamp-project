@@ -31,8 +31,6 @@ public class TransactionStepdefs {
     private Account account;
     private UUID activeCreditCardNumber;
 
-
-
     public TransactionStepdefs() {
         dbUrl = System.getProperty("integration-mysql", "jdbc:mysql://localhost:3316/cc_processing");
         endpoint = System.getProperty("integration-endpoint", "http://localhost:8080");
@@ -53,9 +51,9 @@ public class TransactionStepdefs {
     @When("a purchase transaction request is made,")
     public void aPurchaseTransactionRequestIsMade() {
         HashMap<String, Object> transaction = new HashMap<>();
-        transaction.put("cardNumber", activeCreditCardNumber.toString());
+        transaction.put("cardNumber", account.getCardNumber());
         transaction.put("amount", 2.00);
-        transaction.put("creditLimit", 10000);
+        transaction.put("creditLimit", account.getCreditLimit());
         transaction.put("dateOfTransaction", new Date());
         transaction.put("customer", "Foobar");
         response =  fakeServiceClient
@@ -82,6 +80,6 @@ public class TransactionStepdefs {
 
     private void createAccount() {
         JdbcTemplate template = getJdbcTemplate();
-        template.update("INSERT INTO account SET credit_card_number = ?, active = ?", activeCreditCardNumber.toString(), 1);
+        template.update("INSERT INTO account SET credit_card_number = ?, active = ?, credit_limit = ?", activeCreditCardNumber.toString(), 1, 10000);
     }
 }

@@ -42,4 +42,19 @@ public class TestAccountApiController {
     public void createdAccountIsActive(){
         assertTrue(account.isActive());
     }
+
+    @Test
+    public void accountHasCardholder() {
+        assertNotNull(account.getCardholder());
+    }
+
+    @Test
+    public void cardholderHasName() {
+        assertEquals("Steve Goliath", account.getCardholder().getName());
+    }
+
+    @Test
+    public void cardholderHasSsn() {
+        assertEquals("123-45-6789", account.getCardholder().getSsn());
+    }
 }

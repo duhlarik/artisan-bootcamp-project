@@ -13,11 +13,14 @@ public class Account {
     private final int creditLimit;
     private final boolean active;
 
-    public Account(int id, int creditLimit, String cardNumber, boolean active) {
+    private Cardholder cardholder;
+
+    public Account(int id, int creditLimit, String cardNumber, boolean active, Cardholder cardholder) {
         this.id = id;
         this.creditLimit = creditLimit;
         this.cardNumber = cardNumber;
         this.active = active;
+        this.cardholder =  cardholder;
     }
 
     public int getCreditLimit() {
@@ -30,6 +33,10 @@ public class Account {
 
     public boolean isActive() {
         return active;
+    }
+
+    public Cardholder getCardholder() {
+        return cardholder;
     }
 
     @Override

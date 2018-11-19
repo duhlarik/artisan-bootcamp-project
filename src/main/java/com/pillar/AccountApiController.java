@@ -1,6 +1,7 @@
 package com.pillar;
 
 import com.pillar.account.Account;
+import com.pillar.cardholder.Cardholder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -15,8 +16,14 @@ import java.util.UUID;
 @RequestMapping("/api/account")
 public class AccountApiController {
     @RequestMapping(method = {RequestMethod.POST})
-    public ResponseEntity<Account> create(@RequestBody Map params) {
+    public ResponseEntity<Account> create(@RequestBody Map<String, String> params) {
+        final String name = params.get("cardHolderName");
+        final String ssn = params.get("ssn");
         final UUID uuid = UUID.randomUUID();
-        return new ResponseEntity<>(new Account(1, 10000, uuid.toString(), true), HttpStatus.CREATED);
+
+        final Cardholder cardholder = new Cardholder(1, ssn, name);
+        final Account account = new Account(1, 10000, uuid.toString(), true, cardholder);
+
+        return new ResponseEntity<>(account, HttpStatus.CREATED);
     }
 }

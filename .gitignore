@@ -2,5 +2,6 @@
 .idea
 /build/
 /fake-bank-service/build/
+/fake-bank-service/out/
 /*.iml
 /out

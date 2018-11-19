@@ -56,9 +56,9 @@ public class TransactionStepdefs {
         transaction.put("amount", 2.00);
         transaction.put("creditLimit", account.getCreditLimit());
         transaction.put("dateOfTransaction", new Date());
-        transaction.put("customerId", 3);
+        transaction.put("customerId", 1);
 
-        response = fakeServiceClient
+      response =  fakeServiceClient
                 .post()
                 .uri("/api/transaction")
                 .contentType(MediaType.APPLICATION_JSON)

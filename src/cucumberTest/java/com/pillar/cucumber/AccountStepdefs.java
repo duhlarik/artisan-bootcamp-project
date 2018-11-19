@@ -1,5 +1,6 @@
 package com.pillar.cucumber;
 
+import cucumber.api.PendingException;
 import cucumber.api.java.en.And;
 import cucumber.api.java.en.Given;
 import cucumber.api.java.en.Then;
@@ -64,7 +65,8 @@ public class AccountStepdefs {
 
     @Then("the request should fail and return an Error")
     public void requestShouldFail() {
-        assertEquals(HttpStatus.FORBIDDEN, status);
+        throw new PendingException();
+//      assertEquals(HttpStatus.FORBIDDEN, status);
     }
 
     private void requestCreateAccount(){

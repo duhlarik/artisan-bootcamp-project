@@ -1,6 +1,7 @@
 package com.pillar;
 
 import com.pillar.account.Account;
+import com.pillar.account.AccountRepository;
 import com.pillar.cardholder.Cardholder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,6 +16,12 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/api/account")
 public class AccountApiController {
+    private AccountRepository repository;
+
+    public AccountApiController(AccountRepository repository) {
+        this.repository = repository;
+    }
+
     @RequestMapping(method = {RequestMethod.POST})
     public ResponseEntity<Account> create(@RequestBody Map<String, String> params) {
         final String name = params.get("cardHolderName");

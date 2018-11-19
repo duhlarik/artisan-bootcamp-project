@@ -1,6 +1,7 @@
 package com.pillar;
 
 import com.pillar.account.Account;
+import com.pillar.account.AccountRepository;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -10,13 +11,15 @@ import java.util.Map;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
 
 public class TestAccountApiController {
     private Account account;
 
     @Before
     public void setup() {
-        final AccountApiController controller = new AccountApiController();
+        final AccountRepository repository = mock(AccountRepository.class);
+        final AccountApiController controller = new AccountApiController(repository);
 
         final Map<String, String> params = new HashMap<>();
         params.put("cardHolderName", "Steve Goliath");

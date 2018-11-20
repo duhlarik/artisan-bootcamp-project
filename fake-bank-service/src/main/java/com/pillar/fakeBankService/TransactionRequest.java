@@ -7,16 +7,16 @@ public class TransactionRequest {
 
     public TransactionRequest() {}
 
-    public String getCardNumber() {
-        return cardNumber;
+    public String getCreditCardNumber() {
+        return creditCardNumber;
     }
 
-    public void setCardNumber(String cardNumber) {
-        this.cardNumber = cardNumber;
+    public void setCreditCardNumber(String cardNumber) {
+        this.creditCardNumber = cardNumber;
     }
 
     @NotNull
-    private String cardNumber;
+    private String creditCardNumber;
 
     public Double getAmount() {
         return amount;

@@ -84,13 +84,18 @@ dockerCompose {
     mysqlOnly {
         startedServices = ['mysql']
     }
+    integrationServices {
+        startedServices = ['mysql', 'fake-bank-service']
+    }
 }
 
 tasks.composeUp.dependsOn('docker')
 tasks.composeUp.dependsOn(':fake-bank-service:docker')
+tasks.integrationServicesComposeUp.dependsOn(':fake-bank-service:docker')
 
-task integrationTestSetup(dependsOn: 'mysqlOnlyComposeUp') {}
-task integrationTestTeardown(dependsOn: 'mysqlOnlyComposeDown') {}
+
+task integrationTestSetup(dependsOn: 'integrationServicesComposeUp') {}
+task integrationTestTeardown(dependsOn: 'integrationServicesComposeDown') {}
 
 task integrationTest(type: Test, dependsOn: 'integrationTestSetup') {
     description = 'Runs integration tests.'

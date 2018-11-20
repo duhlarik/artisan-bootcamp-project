@@ -10,11 +10,11 @@ public class Transaction {
     private Double amount;
     private Date dateOfTransaction;
     private Integer customerId;
-    private Double creditLimit;
+    private int creditLimit;
 
     public Transaction() {}
 
-    public Transaction(String cardNumber, Double amount, Date dateOfTransaction, Integer customerId, @Nullable Double creditLimit) {
+    public Transaction(String cardNumber, Double amount, Date dateOfTransaction, Integer customerId, @Nullable int creditLimit) {
         this.cardNumber = cardNumber;
         this.amount = amount;
         this.dateOfTransaction = dateOfTransaction;
@@ -54,11 +54,11 @@ public class Transaction {
         this.customerId = customerId;
     }
 
-    public Double getCreditLimit() {
+    public int getCreditLimit() {
         return creditLimit;
     }
 
-    public void setCreditLimit(Double creditLimit) {
+    public void setCreditLimit(int creditLimit) {
         this.creditLimit = creditLimit;
     }
 }

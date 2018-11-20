@@ -14,7 +14,7 @@ public class TestTransaction {
     private Transaction transaction;
 
     @Before
-    public void setUp() { transaction = new Transaction("1234", 2.00, new Date(), 2,   10000.00);}
+    public void setUp() { transaction = new Transaction("1234", 2.00, new Date(), 2,   10000);}
 
     @Test
     public void testIfTheTransactionIsEqualToNotNull() {

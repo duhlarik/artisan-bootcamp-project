@@ -8,10 +8,7 @@ import com.pillar.customer.Customer;
 import com.pillar.customer.CustomerRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 
@@ -52,5 +49,13 @@ public class AccountApiController {
         } else {
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
+    }
+
+    @PutMapping(path = "/cancel/{cardNumber}")
+    public ResponseEntity<?> cancelAccount(@PathVariable String cardNumber) {
+        Account account = accountRepository.findOneByCreditCardNumber(cardNumber);
+        account.deactivate();
+        accountRepository.save(account);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 }

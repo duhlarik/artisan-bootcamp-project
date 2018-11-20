@@ -1,0 +1,1 @@
+ALTER TABLE account ADD CONSTRAINT unique_card_number UNIQUE (credit_card_number);

@@ -18,6 +18,7 @@ public class Account {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
+    @Column(unique = true)
     private String creditCardNumber;
     private int creditLimit;
     private boolean active;
@@ -61,6 +62,10 @@ public class Account {
 
     public boolean isActive() {
         return active;
+    }
+
+    public void deactivate() {
+        active = false;
     }
 
     public Cardholder getCardholder() {

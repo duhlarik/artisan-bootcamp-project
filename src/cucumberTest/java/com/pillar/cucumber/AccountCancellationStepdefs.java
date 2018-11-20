@@ -7,7 +7,6 @@ import cucumber.api.java.After;
 import cucumber.api.java.en.Given;
 import cucumber.api.java.en.Then;
 import cucumber.api.java.en.When;
-import org.springframework.http.HttpStatus;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.web.reactive.function.client.ClientResponse;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -44,7 +43,7 @@ public class AccountCancellationStepdefs {
         template.update("INSERT INTO cardholder SET id=?, ssn=?, name=?",
                 1, cardholder.getSsn(), cardholder.getName());
         template.update("INSERT INTO account SET id=?, cardholder_id=?, customer_id=?, credit_card_number=?, credit_limit=?, active=?",
-                1, 1, 1, account.getCardNumber(), account.getCreditLimit(), account.isActive());
+                1, 1, 1, account.getCreditCardNumber(), account.getCreditLimit(), account.isActive());
     }
 
     @When("a request is made to cancel the card")
@@ -58,7 +57,10 @@ public class AccountCancellationStepdefs {
 
     @Then("the card should become inactive")
     public void cardBecomesInactive() {
-        assertFalse(account.isActive());
+        JdbcTemplate template = getJdbcTemplate();
+        Boolean active = template.queryForObject(
+                "SELECT active FROM account WHERE id=?", new Object[]{1},  Boolean.class);
+        assertFalse(active);
     }
 
     private JdbcTemplate getJdbcTemplate() {

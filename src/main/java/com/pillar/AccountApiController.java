@@ -40,21 +40,11 @@ public class AccountApiController {
         final String ssn = params.get(CARDHOLDER_SSN);
         final String businessName = params.get(BUSINESS_NAME);
 
-        final Cardholder cardholder;
+        final Cardholder cardholder = cardholderRepository.findOneBySsn(ssn)
+                .orElseGet(() -> cardholderRepository.save(new Cardholder(ssn, name)));
 
-        if (cardholderRepository.existsBySsn(ssn)) {
-            cardholder = cardholderRepository.findOneBySsn(ssn);
-        } else {
-            cardholder = cardholderRepository.save(new Cardholder(ssn, name));
-        }
-
-        final Customer customer;
-
-        if (customerRepository.existsByName(businessName)) {
-            customer = customerRepository.findOneByName(businessName);
-        } else {
-            customer = customerRepository.save(new Customer(businessName));
-        }
+        final Customer customer = customerRepository.findOneByName(businessName)
+                .orElseGet(() -> customerRepository.save(new Customer(businessName)));
 
         if (!accountRepository.existsByCustomerIdAndCardholderId(customer.getId(), cardholder.getId())) {
             final Account account = accountRepository.save(new Account(cardholder, customer));

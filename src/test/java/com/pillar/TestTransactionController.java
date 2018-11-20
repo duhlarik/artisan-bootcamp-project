@@ -1,36 +1,50 @@
 package com.pillar;
 
+import com.pillar.account.Account;
+import com.pillar.account.AccountRepository;
+import com.pillar.cardholder.Cardholder;
 import com.pillar.transaction.Transaction;
-import com.pillar.transaction.TransactionController;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.util.Date;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class TestTransactionController {
-    private static final String TRANSACTION_CREATE = "/create";
-    private static final String TRANSACTION_REQUEST_MAPPING = "/transaction";
 
     private TransactionController controller;
     private MockMvc mockMvc;
+    private BankService bankService;
+    private AccountRepository accountRepository;
+    private Account testAccount;
 
     private Transaction validTransaction;
     private Transaction invalidTransaction;
 
     @Before
     public void setUp() {
-        controller = new TransactionController();
+        accountRepository = mock(AccountRepository.class);
+        bankService = mock(BankService.class);
+
+        controller = new TransactionController(accountRepository, bankService);
+
         mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
-        validTransaction = new Transaction("1234", 4.00, new Date(), 9, 10000.00);
-        invalidTransaction = new Transaction("1234", 3.00, new Date(), 9, 2.00);
+        testAccount = new Account(1, 10000, "1234", true, new Cardholder());
+
+        String cardNumber = "1234";
+        when(accountRepository.findByCardNumber(cardNumber)).thenReturn(testAccount);
+
+        validTransaction = new Transaction("1234", 4.00, new Date(), 9, null);
+        invalidTransaction = new Transaction("1234", 10999.00, new Date(), 9, null);
     }
 
     @Test
@@ -39,18 +53,24 @@ public class TestTransactionController {
     }
 
     @Test
-    public void transactionControllerReturnsOkStatusCodeForPostRequest() throws Exception {
-        HttpStatus transactionResponse = controller.createTransaction(validTransaction);
-        assertEquals(transactionResponse, HttpStatus.OK);
+    public void transactionControllerReturnsOkStatusCodeForPostRequest() {
+        postValidTransaction();
+        ResponseEntity<?> transactionResponse = controller.createTransaction(validTransaction);
+        assertEquals(transactionResponse.getStatusCode(), HttpStatus.CREATED);
     }
 
     @Test
     public void transactionControllerReturnsA403ResponseCodeForInvalidTransaction() {
-        HttpStatus transactionResponse = controller.createTransaction(invalidTransaction);
-        assertEquals(transactionResponse, HttpStatus.FORBIDDEN);
+        postInvalidTransaction();
+        ResponseEntity<?> transactionResponse = controller.createTransaction(invalidTransaction);
+        assertEquals(transactionResponse.getStatusCode(), HttpStatus.FORBIDDEN);
     }
 
-    private ResultActions queryApi(String s) throws Exception {
-        return mockMvc.perform(post(s));
+    private void postValidTransaction() {
+        when(bankService.postTransaction(validTransaction)).thenReturn(HttpStatus.CREATED);
+    }
+
+    private void postInvalidTransaction() {
+        when(bankService.postTransaction(invalidTransaction)).thenReturn(HttpStatus.FORBIDDEN);
     }
 }

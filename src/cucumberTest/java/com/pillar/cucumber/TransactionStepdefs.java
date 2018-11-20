@@ -2,6 +2,7 @@ package com.pillar.cucumber;
 
 import com.pillar.account.Account;
 
+import com.pillar.transaction.Transaction;
 import cucumber.api.java.en.Given;
 import cucumber.api.java.en.Then;
 import cucumber.api.java.en.When;
@@ -51,16 +52,10 @@ public class TransactionStepdefs {
 
     @When("a purchase transaction request is made,")
     public void aPurchaseTransactionRequestIsMade() {
-        HashMap<String, Object> transaction = new HashMap<>();
-        transaction.put("cardNumber", account.getCreditCardNumber());
-        transaction.put("amount", 2.00);
-        transaction.put("creditLimit", account.getCreditLimit());
-        transaction.put("dateOfTransaction", new Date());
-        transaction.put("customerId", account.getCustomer().getId());
-
-        response = fakeServiceClient
+        Transaction transaction = new Transaction(account.getCreditCardNumber(), 2.00, new Date(), 1, account.getCreditLimit());
+       response =  client
                 .post()
-                .uri("/api/makeTransaction")
+                .uri("/transaction/create")
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(BodyInserters.fromObject(transaction))
                 .exchange()

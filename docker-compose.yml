@@ -7,6 +7,8 @@ services:
     environment:
       MYSQL_HOST: 'mysql'
       MYSQL_PORT: '3306'
+      BANKSERVICE_HOST: 'fake-bank-service'
+      BANKSERVICE_PORT: '8080'
     depends_on:
       - "mysql"
   mysql:
@@ -17,6 +19,7 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: 'password'
       MYSQL_DATABASE: 'cc_processing'
+
   fake-bank-service:
     image: 'com.pillar/fake-bank-service'
     ports:

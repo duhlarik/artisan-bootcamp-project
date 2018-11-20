@@ -18,6 +18,10 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/account")
 public class AccountApiController {
+    public static final String CARDHOLDER_NAME = "cardholderName";
+    public static final String CARDHOLDER_SSN = "cardholderSsn";
+    public static final String BUSINESS_NAME = "businessName";
+
     private final AccountRepository accountRepository;
     private final CardholderRepository cardholderRepository;
     private final CustomerRepository customerRepository;
@@ -30,9 +34,9 @@ public class AccountApiController {
 
     @RequestMapping(method = {RequestMethod.POST})
     public ResponseEntity<Account> create(@RequestBody Map<String, String> params) {
-        final String name = params.get("cardHolderName");
-        final String ssn = params.get("ssn");
-        final String businessName = params.get("businessName");
+        final String name = params.get(CARDHOLDER_NAME);
+        final String ssn = params.get(CARDHOLDER_SSN);
+        final String businessName = params.get(BUSINESS_NAME);
 
         final Cardholder cardholder;
 

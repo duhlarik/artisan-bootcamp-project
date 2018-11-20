@@ -1,6 +1,7 @@
 package com.pillar.cucumber;
 
 import com.mysql.cj.jdbc.MysqlDataSource;
+import com.pillar.AccountApiController;
 import cucumber.api.java.After;
 import cucumber.api.java.en.And;
 import cucumber.api.java.en.Given;
@@ -23,7 +24,7 @@ import static org.junit.Assert.assertNotNull;
 public class AccountStepdefs {
     private final WebClient client;
 
-    private String cardHolderName;
+    private String cardholderName;
     private String ssn;
     private String businessName;
 
@@ -37,7 +38,7 @@ public class AccountStepdefs {
 
     @Given("a cardholder Name: {string}, SSN: {string}, Business Name: {string}")
     public void aCardHolder(String cardholderName, String ssn, String businessName) {
-        this.cardHolderName = cardholderName;
+        this.cardholderName = cardholderName;
         this.ssn = ssn;
         this.businessName = businessName;
     }
@@ -72,9 +73,9 @@ public class AccountStepdefs {
 
     private void requestCreateAccount(){
         final HashMap<String, String> payload = new HashMap<>();
-        payload.put("cardHolderName", cardHolderName);
-        payload.put("ssn", ssn);
-        payload.put("businessName", businessName);
+        payload.put(AccountApiController.CARDHOLDER_NAME, cardholderName);
+        payload.put(AccountApiController.CARDHOLDER_SSN, ssn);
+        payload.put(AccountApiController.BUSINESS_NAME, businessName);
 
         final ClientResponse response = client
                 .post()

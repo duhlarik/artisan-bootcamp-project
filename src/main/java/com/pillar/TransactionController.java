@@ -3,7 +3,6 @@ package com.pillar;
 import com.pillar.account.Account;
 import com.pillar.account.AccountRepository;
 import com.pillar.transaction.Transaction;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 

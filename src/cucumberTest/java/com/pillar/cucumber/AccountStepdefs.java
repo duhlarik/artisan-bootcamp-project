@@ -1,12 +1,14 @@
 package com.pillar.cucumber;
 
-import cucumber.api.PendingException;
+import com.mysql.cj.jdbc.MysqlDataSource;
+import cucumber.api.java.After;
 import cucumber.api.java.en.And;
 import cucumber.api.java.en.Given;
 import cucumber.api.java.en.Then;
 import cucumber.api.java.en.When;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.ClientResponse;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -53,8 +55,8 @@ public class AccountStepdefs {
     @Then("a new account is created and a new card number is issued to that account and returned")
     public void aNewAccountIsCreated() {
         assertEquals(HttpStatus.CREATED, status);
-        assertTrue(body.containsKey("cardNumber"));
-        assertNotNull(body.get("cardNumber"));
+        assertTrue(body.containsKey("creditCardNumber"));
+        assertNotNull(body.get("creditCardNumber"));
     }
 
     @And("a credit limit of 10,000 is assigned")
@@ -65,15 +67,14 @@ public class AccountStepdefs {
 
     @Then("the request should fail and return an Error")
     public void requestShouldFail() {
-        throw new PendingException();
-//      assertEquals(HttpStatus.FORBIDDEN, status);
+        assertEquals(HttpStatus.FORBIDDEN, status);
     }
 
     private void requestCreateAccount(){
         final HashMap<String, String> payload = new HashMap<>();
-        payload.put("card_holder_name", cardHolderName);
+        payload.put("cardHolderName", cardHolderName);
         payload.put("ssn", ssn);
-        payload.put("business_name", businessName);
+        payload.put("businessName", businessName);
 
         final ClientResponse response = client
                 .post()
@@ -85,5 +86,18 @@ public class AccountStepdefs {
 
         status = response.statusCode();
         body = response.bodyToMono(Map.class).block();
+    }
+
+    @After
+    public void tearDown() {
+        MysqlDataSource dataSource = new MysqlDataSource();
+        dataSource.setURL("jdbc:mysql://localhost:3316/cc_processing");
+        dataSource.setUser("root");
+        dataSource.setPassword("password");
+
+        final JdbcTemplate template = new JdbcTemplate(dataSource);
+        template.execute("DELETE FROM account");
+        template.execute("DELETE FROM customer");
+        template.execute("DELETE FROM cardholder");
     }
 }

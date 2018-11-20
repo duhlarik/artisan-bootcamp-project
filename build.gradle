@@ -91,6 +91,8 @@ dockerCompose {
 
 tasks.composeUp.dependsOn('docker')
 tasks.composeUp.dependsOn(':fake-bank-service:docker')
+tasks.integrationServicesComposeUp.dependsOn(':fake-bank-service:docker')
+
 
 task integrationTestSetup(dependsOn: 'integrationServicesComposeUp') {}
 task integrationTestTeardown(dependsOn: 'integrationServicesComposeDown') {}

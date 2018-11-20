@@ -48,9 +48,9 @@ public class TestAccountApiController {
 
     private void createAccount() {
         final Map<String, String> params = new HashMap<>();
-        params.put("cardHolderName", cardholder.getName());
-        params.put("ssn", cardholder.getSsn());
-        params.put("businessName", customer.getName());
+        params.put(AccountApiController.CARDHOLDER_NAME, cardholder.getName());
+        params.put(AccountApiController.CARDHOLDER_SSN, cardholder.getSsn());
+        params.put(AccountApiController.BUSINESS_NAME, customer.getName());
 
         account = controller.create(params).getBody();
     }

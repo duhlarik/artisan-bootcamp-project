@@ -8,15 +8,20 @@ import java.util.Objects;
 
 @Entity
 public class Cardholder {
+    public static final String NAME = "name";
+    public static final String SSN = "ssn";
+
     @Id
-    @GeneratedValue(strategy= GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
     private String ssn;
     private String name;
 
-    public Cardholder() {
+    public Cardholder() {}
 
+    public Cardholder(String ssn, String name) {
+        this(null, ssn, name);
     }
 
     public Cardholder(Integer id, String ssn, String name) {

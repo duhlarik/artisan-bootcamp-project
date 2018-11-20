@@ -8,6 +8,8 @@ import java.util.Objects;
 
 @Entity
 public class Customer {
+    public static final String NAME = "name";
+
     @Id
     @GeneratedValue(strategy= GenerationType.IDENTITY)
     private Integer id;
@@ -15,6 +17,10 @@ public class Customer {
     private String name;
 
     public Customer() {}
+
+    public Customer(String name) {
+        this(null, name);
+    }
 
     public Customer(Integer id, String name) {
         this.id = id;

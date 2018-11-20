@@ -45,7 +45,7 @@ public class CustomerStepdefs {
 
     @Then("the name is {string}")
     public void theNameIs(String name) {
-        assertEquals(response.get("name"), name);
+        assertEquals(response.get(Customer.NAME), name);
     }
 
     private Map getObjectForUrl(String uri) {

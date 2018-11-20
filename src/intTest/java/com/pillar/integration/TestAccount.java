@@ -45,6 +45,9 @@ public class TestAccount {
     @Autowired
     private AccountRepository accountRepository;
 
+    @Autowired
+    JdbcTemplate jdbcTemplate;
+
     @Test
     public void createsNewCardholder() {
         createAccount();
@@ -98,26 +101,17 @@ public class TestAccount {
 
     private void createAccount() {
         final Map<String, String> params = new HashMap<>();
-        params.put("cardHolderName", TEST_CARDHOLDER_NAME);
-        params.put("ssn", TEST_CARDHOLDER_SSN);
-        params.put("businessName", TEST_BUSINESS);
+        params.put(AccountApiController.CARDHOLDER_NAME, TEST_CARDHOLDER_NAME);
+        params.put(AccountApiController.CARDHOLDER_SSN, TEST_CARDHOLDER_SSN);
+        params.put(AccountApiController.BUSINESS_NAME, TEST_BUSINESS);
 
         account = controller.create(params).getBody();
     }
 
     @After
     public void tearDown() {
-        JdbcTemplate template = getJdbcTemplate();
-        template.execute("DELETE FROM account");
-        template.execute("DELETE FROM cardholder");
-        template.execute("DELETE FROM customer");
-    }
-
-    private JdbcTemplate getJdbcTemplate() {
-        MysqlDataSource dataSource = new MysqlDataSource();
-        dataSource.setURL(dbUrl);
-        dataSource.setUser("root");
-        dataSource.setPassword("password");
-        return new JdbcTemplate(dataSource);
+        jdbcTemplate.execute("DELETE FROM account");
+        jdbcTemplate.execute("DELETE FROM cardholder");
+        jdbcTemplate.execute("DELETE FROM customer");
     }
 }

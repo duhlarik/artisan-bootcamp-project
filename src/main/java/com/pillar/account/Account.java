@@ -10,10 +10,15 @@ import java.util.UUID;
 
 @Entity
 public class Account {
+    public static final String CREDIT_CARD_NUMBER = "creditCardNumber";
+    public static final String CREDIT_LIMIT = "creditLimit";
+    public static final String ACTIVE = "active";
+
     @Id
-    @GeneratedValue(strategy= GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
+    @Column(unique = true)
     private String creditCardNumber;
     private int creditLimit;
     private boolean active;
@@ -28,9 +33,7 @@ public class Account {
     @JoinColumn(name = "customer_id")
     private Customer customer;
 
-    public Account() {
-
-    }
+    public Account() {}
 
     public Account(Cardholder cardholder, Customer customer) {
         this.id = null;
@@ -59,6 +62,10 @@ public class Account {
 
     public boolean isActive() {
         return active;
+    }
+
+    public void deactivate() {
+        active = false;
     }
 
     public Cardholder getCardholder() {

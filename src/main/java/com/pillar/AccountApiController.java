@@ -8,16 +8,20 @@ import com.pillar.customer.Customer;
 import com.pillar.customer.CustomerRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/account")
 public class AccountApiController {
+    public static final String ENDPOINT = "/api/account";
+
+    public static final String CARDHOLDER_NAME = "cardholderName";
+    public static final String CARDHOLDER_SSN = "cardholderSsn";
+    public static final String BUSINESS_NAME = "businessName";
+
     private final AccountRepository accountRepository;
     private final CardholderRepository cardholderRepository;
     private final CustomerRepository customerRepository;
@@ -30,31 +34,34 @@ public class AccountApiController {
 
     @RequestMapping(method = {RequestMethod.POST})
     public ResponseEntity<Account> create(@RequestBody Map<String, String> params) {
-        final String name = params.get("cardHolderName");
-        final String ssn = params.get("ssn");
-        final String businessName = params.get("businessName");
+        final String name = params.get(CARDHOLDER_NAME);
+        final String ssn = params.get(CARDHOLDER_SSN);
+        final String businessName = params.get(BUSINESS_NAME);
 
-        final Cardholder cardholder;
+        final Cardholder cardholder = cardholderRepository.findOneBySsn(ssn)
+                .orElseGet(() -> cardholderRepository.save(new Cardholder(ssn, name)));
 
-        if (cardholderRepository.existsBySsn(ssn)) {
-            cardholder = cardholderRepository.findBySsn(ssn).get(0);
-        } else {
-            cardholder = cardholderRepository.save(new Cardholder(null, ssn, name));
-        }
-
-        final Customer customer;
-
-        if (customerRepository.existsByName(businessName)) {
-            customer = customerRepository.findByName(businessName).get(0);
-        } else {
-            customer = customerRepository.save(new Customer(null, businessName));
-        }
+        final Customer customer = customerRepository.findOneByName(businessName)
+                .orElseGet(() -> customerRepository.save(new Customer(businessName)));
 
         if (!accountRepository.existsByCustomerIdAndCardholderId(customer.getId(), cardholder.getId())) {
             final Account account = accountRepository.save(new Account(cardholder, customer));
             return new ResponseEntity<>(account, HttpStatus.CREATED);
         } else {
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
+    }
+
+    @PutMapping(path = "/cancel/{cardNumber}")
+    public ResponseEntity<?> cancelAccount(@PathVariable String cardNumber) {
+        final Optional<Account> found = accountRepository.findOneByCreditCardNumber(cardNumber);
+        if (found.isPresent()) {
+            Account account = found.get();
+            account.deactivate();
+            accountRepository.save(account);
+            return new ResponseEntity<>(HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
 }

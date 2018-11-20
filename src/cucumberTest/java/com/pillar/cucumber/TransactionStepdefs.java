@@ -1,5 +1,6 @@
 package com.pillar.cucumber;
 
+import com.pillar.AccountApiController;
 import com.pillar.account.Account;
 
 import com.pillar.transaction.Transaction;
@@ -35,13 +36,13 @@ public class TransactionStepdefs {
     @Given("an active card and account")
     public void anActiveCardAndAccount(){
         final HashMap<String, String> payload = new HashMap<>();
-        payload.put("cardholderName", "Steve Goliath");
-        payload.put("ssn", "123-45-6788");
-        payload.put("businessName", "Target");
+        payload.put(AccountApiController.CARDHOLDER_NAME, "Steve Goliath");
+        payload.put(AccountApiController.CARDHOLDER_SSN, "123-45-6788");
+        payload.put(AccountApiController.BUSINESS_NAME, "Target");
 
         final ClientResponse response = client
                 .post()
-                .uri("/api/account")
+                .uri(AccountApiController.ENDPOINT)
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(BodyInserters.fromObject(payload))
                 .exchange()

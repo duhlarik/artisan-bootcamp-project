@@ -29,16 +29,16 @@ public class TransactionRequest {
     @NotNull
     private Double amount;
 
-    public Double getCreditLimit() {
+    public Integer getCreditLimit() {
         return creditLimit;
     }
 
-    public void setCreditLimit(Double creditLimit) {
+    public void setCreditLimit(Integer creditLimit) {
         this.creditLimit = creditLimit;
     }
 
     @NotNull
-    private Double creditLimit;
+    private Integer creditLimit;
 
     public Date getDateOfTransaction() {
         return dateOfTransaction;

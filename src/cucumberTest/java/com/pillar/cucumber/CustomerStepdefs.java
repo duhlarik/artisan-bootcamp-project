@@ -1,12 +1,15 @@
 package com.pillar.cucumber;
 
 import com.mysql.cj.jdbc.MysqlDataSource;
+import com.pillar.customer.Customer;
 import cucumber.api.java.en.Given;
 import cucumber.api.java.en.Then;
 import cucumber.api.java.en.When;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.web.reactive.function.client.WebClient;
 
+import java.sql.ResultSet;
+import java.util.List;
 import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
@@ -27,12 +30,17 @@ public class CustomerStepdefs {
     @Given("a customer")
     public void aCustomer() {
         JdbcTemplate template = getJdbcTemplate();
-        template.update("INSERT INTO customer SET id=?, name=?", 1, "Test Customer");
+        template.update("INSERT INTO customer SET name=?", "Test Customer");
+
+        final List<Integer> customerIds = template.query("SELECT id FROM customer WHERE name=? LIMIT 1", new String[] { "Test Customer" },
+                (ResultSet rs, int rowNum) -> rs.getInt("ID"));
+
+        id = customerIds.get(0);
     }
 
     @When("I request it's information")
     public void iRequestItsInformation() {
-        response = getObjectForUrl("/api/customer/1", Map.class);
+        response = getObjectForUrl("/api/customer/" + id);
     }
 
     @Then("the name is {string}")
@@ -40,12 +48,12 @@ public class CustomerStepdefs {
         assertEquals(response.get("name"), name);
     }
 
-    private Map getObjectForUrl(String uri, Class<Map> bodyType) {
+    private Map getObjectForUrl(String uri) {
         return client
                 .get()
                 .uri(uri)
                 .retrieve()
-                .bodyToMono(bodyType)
+                .bodyToMono(Map.class)
                 .block();
     }
 

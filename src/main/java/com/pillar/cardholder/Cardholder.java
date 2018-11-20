@@ -10,7 +10,7 @@ import java.util.Objects;
 public class Cardholder {
     @Id
     @GeneratedValue(strategy= GenerationType.IDENTITY)
-    private Long id;
+    private Integer id;
 
     private String ssn;
     private String name;
@@ -19,10 +19,14 @@ public class Cardholder {
 
     }
 
-    public Cardholder(Long id, String ssn, String name) {
+    public Cardholder(Integer id, String ssn, String name) {
         this.id = id;
         this.ssn = ssn;
         this.name = name;
+    }
+
+    public Integer getId() {
+        return id;
     }
 
     public String getSsn() {

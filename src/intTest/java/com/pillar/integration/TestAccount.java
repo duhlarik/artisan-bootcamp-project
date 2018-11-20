@@ -33,11 +33,30 @@ public class TestAccount {
     CardholderRepository cardholderRepository;
 
     @Test
+    public void createsNewCardholder() {
+        createAccount();
+        assertEquals(1, cardholderRepository.findBySsn(TEST_CARDHOLDER_SSN).size());
+    }
+
+    @Test
     public void doesNotDuplicateCardholder() {
         createAccount();
         createAccount();
 
         assertEquals(1, cardholderRepository.findBySsn(TEST_CARDHOLDER_SSN).size());
+    }
+
+    @Test
+    public void createsNewCustomer() {
+        createAccount();
+        assertEquals(1, customerRepository.findByName(TEST_BUSINESS).size());
+    }
+
+    @Test
+    public void doesNotDuplicateCustomer() {
+        createAccount();
+        createAccount();
+        assertEquals(1, customerRepository.findByName(TEST_BUSINESS).size());
     }
 
     private void createAccount() {

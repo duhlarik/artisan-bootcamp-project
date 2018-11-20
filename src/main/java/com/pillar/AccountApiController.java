@@ -4,6 +4,7 @@ import com.pillar.account.Account;
 import com.pillar.account.AccountRepository;
 import com.pillar.cardholder.Cardholder;
 import com.pillar.cardholder.CardholderRepository;
+import com.pillar.customer.Customer;
 import com.pillar.customer.CustomerRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -31,11 +32,17 @@ public class AccountApiController {
     public ResponseEntity<Account> create(@RequestBody Map<String, String> params) {
         final String name = params.get("cardHolderName");
         final String ssn = params.get("ssn");
+        final String businessName = params.get("businessName");
 
         final Cardholder cardholder = new Cardholder(null, ssn, name);
+        final Customer customer = new Customer(null, businessName);
 
         if (!cardholderRepository.existsBySsn(ssn)) {
             cardholderRepository.save(cardholder);
+        }
+
+        if (!customerRepository.existsByName(businessName)) {
+            customerRepository.save(customer);
         }
 
         final Account account = new Account(cardholder);

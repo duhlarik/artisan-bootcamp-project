@@ -2,6 +2,7 @@ package com.pillar.cucumber;
 
 import com.mysql.cj.jdbc.MysqlDataSource;
 import com.pillar.AccountApiController;
+import com.pillar.account.Account;
 import cucumber.api.java.After;
 import cucumber.api.java.en.And;
 import cucumber.api.java.en.Given;
@@ -56,14 +57,14 @@ public class AccountStepdefs {
     @Then("a new account is created and a new card number is issued to that account and returned")
     public void aNewAccountIsCreated() {
         assertEquals(HttpStatus.CREATED, status);
-        assertTrue(body.containsKey("creditCardNumber"));
-        assertNotNull(body.get("creditCardNumber"));
+        assertTrue(body.containsKey(Account.CREDIT_CARD_NUMBER));
+        assertNotNull(body.get(Account.CREDIT_CARD_NUMBER));
     }
 
     @And("a credit limit of 10,000 is assigned")
     public void aCreditLimitIsAssigned() {
-        assertTrue(body.containsKey("creditLimit"));
-        assertEquals(10000, body.get("creditLimit"));
+        assertTrue(body.containsKey(Account.CREDIT_LIMIT));
+        assertEquals(10000, body.get(Account.CREDIT_LIMIT));
     }
 
     @Then("the request should fail and return an Error")

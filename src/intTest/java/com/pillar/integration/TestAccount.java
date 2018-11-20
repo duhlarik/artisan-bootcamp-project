@@ -4,10 +4,12 @@ import com.pillar.AccountApiController;
 import com.pillar.account.AccountRepository;
 import com.pillar.cardholder.CardholderRepository;
 import com.pillar.customer.CustomerRepository;
+import org.junit.After;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.junit4.SpringRunner;
 
@@ -35,6 +37,9 @@ public class TestAccount {
 
     @Autowired
     private AccountRepository accountRepository;
+
+    @Autowired
+    JdbcTemplate jdbcTemplate;
 
     @Test
     public void createsNewCardholder() {
@@ -75,10 +80,17 @@ public class TestAccount {
 
     private void createAccount() {
         final Map<String, String> params = new HashMap<>();
-        params.put("cardHolderName", TEST_CARDHOLDER_NAME);
-        params.put("ssn", TEST_CARDHOLDER_SSN);
-        params.put("businessName", TEST_BUSINESS);
+        params.put(AccountApiController.CARDHOLDER_NAME, TEST_CARDHOLDER_NAME);
+        params.put(AccountApiController.CARDHOLDER_SSN, TEST_CARDHOLDER_SSN);
+        params.put(AccountApiController.BUSINESS_NAME, TEST_BUSINESS);
 
-        controller.create(params).getBody();
+        controller.create(params);
+    }
+
+    @After
+    public void tearDown() {
+        jdbcTemplate.execute("DELETE FROM account");
+        jdbcTemplate.execute("DELETE FROM cardholder");
+        jdbcTemplate.execute("DELETE FROM customer");
     }
 }

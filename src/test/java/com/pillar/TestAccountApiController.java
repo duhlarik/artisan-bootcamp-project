@@ -2,6 +2,8 @@ package com.pillar;
 
 import com.pillar.account.Account;
 import com.pillar.account.AccountRepository;
+import com.pillar.cardholder.CardholderRepository;
+import com.pillar.customer.CustomerRepository;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -15,12 +17,20 @@ import static org.mockito.Mockito.mock;
 
 public class TestAccountApiController {
     private Account account;
+    private AccountApiController controller;
+    private CardholderRepository cardholderRepository;
 
     @Before
     public void setup() {
         final AccountRepository repository = mock(AccountRepository.class);
-        final AccountApiController controller = new AccountApiController(repository);
+        cardholderRepository = mock(CardholderRepository.class);
+        final CustomerRepository customerRepository = mock(CustomerRepository.class);
+        controller = new AccountApiController(repository, cardholderRepository, customerRepository);
 
+        createAccount();
+    }
+
+    private void createAccount() {
         final Map<String, String> params = new HashMap<>();
         params.put("cardHolderName", "Steve Goliath");
         params.put("ssn", "123-45-6789");

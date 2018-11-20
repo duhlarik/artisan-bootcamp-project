@@ -1,6 +1,8 @@
 package com.pillar.account;
 
 import com.pillar.cardholder.Cardholder;
+import com.pillar.customer.Customer;
+import org.springframework.lang.NonNull;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -18,9 +20,15 @@ public class Account {
     private int creditLimit;
     private boolean active;
 
+    @NonNull
     @ManyToOne
     @JoinColumn(name = "cardholder_id")
     private Cardholder cardholder;
+
+    @NonNull
+    @ManyToOne
+    @JoinColumn(name = "customer_id")
+    private Customer customer;
 
     public Account() {
 
@@ -58,12 +66,16 @@ public class Account {
         return cardholder;
     }
 
+    public Customer getCustomer() {
+        return customer;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Account account = (Account) o;
-        return id == account.id;
+        return id.equals(account.id);
     }
 
     @Override

@@ -1,13 +1,17 @@
 package com.pillar.cardholder;
 
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import java.util.Objects;
 
 @Entity
 public class Cardholder {
     @Id
-    private Integer id;
+    @GeneratedValue(strategy= GenerationType.IDENTITY)
+    private Long id;
+
     private String ssn;
     private String name;
 
@@ -15,7 +19,7 @@ public class Cardholder {
 
     }
 
-    public Cardholder(int id, String ssn, String name) {
+    public Cardholder(Long id, String ssn, String name) {
         this.id = id;
         this.ssn = ssn;
         this.name = name;
@@ -34,7 +38,7 @@ public class Cardholder {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Cardholder that = (Cardholder) o;
-        return id.equals(that.id);
+        return Objects.equals(id, that.id);
     }
 
     @Override

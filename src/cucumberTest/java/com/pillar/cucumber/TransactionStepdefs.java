@@ -52,12 +52,13 @@ public class TransactionStepdefs {
     @When("a purchase transaction request is made,")
     public void aPurchaseTransactionRequestIsMade() {
         HashMap<String, Object> transaction = new HashMap<>();
-        transaction.put("cardNumber", account.getCardNumber());
+        transaction.put("cardNumber", account.getCreditCardNumber());
         transaction.put("amount", 2.00);
         transaction.put("creditLimit", account.getCreditLimit());
         transaction.put("dateOfTransaction", new Date());
-        transaction.put("customerId", 1);
-      response =  fakeServiceClient
+        transaction.put("customerId", account.getCustomer().getId());
+
+        response = fakeServiceClient
                 .post()
                 .uri("/api/makeTransaction")
                 .contentType(MediaType.APPLICATION_JSON)

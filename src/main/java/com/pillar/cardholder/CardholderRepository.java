@@ -6,5 +6,6 @@ import java.util.List;
 
 public interface CardholderRepository extends JpaRepository<Cardholder, Integer> {
     boolean existsBySsn(String ssn);
+    Cardholder findOneBySsn(String ssn);
     List<Cardholder> findBySsn(String ssn);
 }

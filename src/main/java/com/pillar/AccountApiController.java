@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/account")
@@ -53,9 +54,14 @@ public class AccountApiController {
 
     @PutMapping(path = "/cancel/{cardNumber}")
     public ResponseEntity<?> cancelAccount(@PathVariable String cardNumber) {
-        Account account = accountRepository.findOneByCreditCardNumber(cardNumber);
-        account.deactivate();
-        accountRepository.save(account);
-        return new ResponseEntity<>(HttpStatus.OK);
+        final Optional<Account> found = accountRepository.findOneByCreditCardNumber(cardNumber);
+        if (found.isPresent()) {
+            Account account = found.get();
+            account.deactivate();
+            accountRepository.save(account);
+            return new ResponseEntity<>(HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
     }
 }

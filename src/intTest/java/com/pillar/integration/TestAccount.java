@@ -1,6 +1,5 @@
 package com.pillar.integration;
 
-import com.mysql.cj.jdbc.MysqlDataSource;
 import com.pillar.AccountApiController;
 import com.pillar.account.Account;
 import com.pillar.account.AccountRepository;
@@ -17,10 +16,9 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.*;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @Rollback
@@ -95,8 +93,13 @@ public class TestAccount {
     public void cancelsAccountByCardNumber() {
         createAccount();
         controller.cancelAccount(account.getCreditCardNumber());
-        Account changedAccount = accountRepository.findOneByCreditCardNumber(account.getCreditCardNumber());
-        assertFalse(changedAccount.isActive());
+        Optional<Account> maybeChangedAccount = accountRepository.findOneByCreditCardNumber(account.getCreditCardNumber());
+        if (maybeChangedAccount.isPresent()) {
+            Account changedAccount = maybeChangedAccount.get();
+            assertFalse(changedAccount.isActive());
+        } else {
+            fail();
+        }
     }
 
     private void createAccount() {

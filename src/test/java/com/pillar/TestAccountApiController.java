@@ -2,39 +2,55 @@ package com.pillar;
 
 import com.pillar.account.Account;
 import com.pillar.account.AccountRepository;
+import com.pillar.cardholder.Cardholder;
 import com.pillar.cardholder.CardholderRepository;
+import com.pillar.customer.Customer;
 import com.pillar.customer.CustomerRepository;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class TestAccountApiController {
+    private final Cardholder cardholder = new Cardholder(1, "123-45-6789", "Steve Goliath");
+    private final Customer customer = new Customer(1, "Target");
+
     private Account account;
     private AccountApiController controller;
-    private CardholderRepository cardholderRepository;
 
     @Before
     public void setup() {
-        final AccountRepository repository = mock(AccountRepository.class);
-        cardholderRepository = mock(CardholderRepository.class);
-        final CustomerRepository customerRepository = mock(CustomerRepository.class);
-        controller = new AccountApiController(repository, cardholderRepository, customerRepository);
+        final CardholderRepository cardholderRepository = mock(CardholderRepository.class);
+        when(cardholderRepository.findBySsn(cardholder.getSsn())).thenReturn(Collections.emptyList());
+        when(cardholderRepository.save(any())).thenReturn(cardholder);
 
+        final CustomerRepository customerRepository = mock(CustomerRepository.class);
+        when(customerRepository.findByName(customer.getName())).thenReturn(Collections.emptyList());
+        when(customerRepository.save(any())).thenReturn(customer);
+
+        final AccountRepository repository = mock(AccountRepository.class);
+        when(repository.existsByCustomerIdAndCardholderId(anyInt(), anyInt())).thenReturn(false);
+        when(repository.save(any())).thenReturn(new Account(cardholder, customer));
+
+        controller = new AccountApiController(repository, cardholderRepository, customerRepository);
         createAccount();
     }
 
     private void createAccount() {
         final Map<String, String> params = new HashMap<>();
-        params.put("cardHolderName", "Steve Goliath");
-        params.put("ssn", "123-45-6789");
-        params.put("businessName", "Target");
+        params.put("cardHolderName", cardholder.getName());
+        params.put("ssn", cardholder.getSsn());
+        params.put("businessName", customer.getName());
 
         account = controller.create(params).getBody();
     }
@@ -63,11 +79,11 @@ public class TestAccountApiController {
 
     @Test
     public void cardholderHasName() {
-        assertEquals("Steve Goliath", account.getCardholder().getName());
+        assertEquals(cardholder.getName(), account.getCardholder().getName());
     }
 
     @Test
     public void cardholderHasSsn() {
-        assertEquals("123-45-6789", account.getCardholder().getSsn());
+        assertEquals(cardholder.getSsn(), account.getCardholder().getSsn());
     }
 }

@@ -18,6 +18,8 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/account")
 public class AccountApiController {
+    public static final String ENDPOINT = "/api/account";
+
     public static final String CARDHOLDER_NAME = "cardholderName";
     public static final String CARDHOLDER_SSN = "cardholderSsn";
     public static final String BUSINESS_NAME = "businessName";

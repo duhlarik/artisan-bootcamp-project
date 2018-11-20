@@ -80,7 +80,7 @@ public class AccountStepdefs {
 
         final ClientResponse response = client
                 .post()
-                .uri("/api/account")
+                .uri(AccountApiController.ENDPOINT)
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(BodyInserters.fromObject(payload))
                 .exchange()

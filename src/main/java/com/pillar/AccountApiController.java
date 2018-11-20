@@ -34,19 +34,27 @@ public class AccountApiController {
         final String ssn = params.get("ssn");
         final String businessName = params.get("businessName");
 
-        final Cardholder cardholder = new Cardholder(null, ssn, name);
-        final Customer customer = new Customer(null, businessName);
+        final Cardholder cardholder;
 
-        if (!cardholderRepository.existsBySsn(ssn)) {
-            cardholderRepository.save(cardholder);
+        if (cardholderRepository.existsBySsn(ssn)) {
+            cardholder = cardholderRepository.findBySsn(ssn).get(0);
+        } else {
+            cardholder = cardholderRepository.save(new Cardholder(null, ssn, name));
         }
 
-        if (!customerRepository.existsByName(businessName)) {
-            customerRepository.save(customer);
+        final Customer customer;
+
+        if (customerRepository.existsByName(businessName)) {
+            customer = customerRepository.findByName(businessName).get(0);
+        } else {
+            customer = customerRepository.save(new Customer(null, businessName));
         }
 
-        final Account account = new Account(cardholder);
-
-        return new ResponseEntity<>(account, HttpStatus.CREATED);
+        if (!accountRepository.existsByCustomerIdAndCardholderId(customer.getId(), cardholder.getId())) {
+            final Account account = accountRepository.save(new Account(cardholder, customer));
+            return new ResponseEntity<>(account, HttpStatus.CREATED);
+        } else {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
     }
 }

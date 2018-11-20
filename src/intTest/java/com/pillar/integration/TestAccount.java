@@ -1,6 +1,7 @@
 package com.pillar.integration;
 
 import com.pillar.AccountApiController;
+import com.pillar.account.AccountRepository;
 import com.pillar.cardholder.CardholderRepository;
 import com.pillar.customer.CustomerRepository;
 import org.junit.Test;
@@ -24,17 +25,21 @@ public class TestAccount {
     private static final String TEST_BUSINESS = "Target";
 
     @Autowired
-    CustomerRepository customerRepository;
+    private AccountApiController controller;
 
     @Autowired
-    AccountApiController controller;
+    private CustomerRepository customerRepository;
 
     @Autowired
-    CardholderRepository cardholderRepository;
+    private CardholderRepository cardholderRepository;
+
+    @Autowired
+    private AccountRepository accountRepository;
 
     @Test
     public void createsNewCardholder() {
         createAccount();
+
         assertEquals(1, cardholderRepository.findBySsn(TEST_CARDHOLDER_SSN).size());
     }
 
@@ -49,6 +54,7 @@ public class TestAccount {
     @Test
     public void createsNewCustomer() {
         createAccount();
+
         assertEquals(1, customerRepository.findByName(TEST_BUSINESS).size());
     }
 
@@ -56,7 +62,15 @@ public class TestAccount {
     public void doesNotDuplicateCustomer() {
         createAccount();
         createAccount();
+
         assertEquals(1, customerRepository.findByName(TEST_BUSINESS).size());
+    }
+
+    @Test
+    public void createsNewAccount() {
+        createAccount();
+
+        assertEquals(1, accountRepository.findAll().size());
     }
 
     private void createAccount() {

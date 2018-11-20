@@ -46,7 +46,7 @@ public class TestAccountApiController {
 
     @Test
     public void createdAccountHasCardNumber() {
-        final String cardNumber = account.getCardNumber();
+        final String cardNumber = account.getCreditCardNumber();
         assertNotNull(cardNumber);
         assertEquals(cardNumber.length(), 36);
     }

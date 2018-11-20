@@ -1,24 +1,48 @@
 package com.pillar.account;
 
-import javax.persistence.Id;
-import java.util.Objects;
+import com.pillar.cardholder.Cardholder;
 
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import java.util.Objects;
+import java.util.UUID;
+
+@Entity
 public class Account {
     @Id
-    private final int id;
+    private Integer id;
 
-    private final String cardNumber;
-    private final double creditLimit;
-    private final boolean active;
+    private String cardNumber;
+    private int creditLimit;
+    private boolean active;
 
-    public Account(int id, double creditLimit, String cardNumber, boolean active) {
+    @ManyToOne
+    @JoinColumn(name = "cardholder_id")
+    private Cardholder cardholder;
+
+    public Account() {
+
+    }
+
+    public Account(Cardholder cardholder) {
+        this.id = null;
+        this.creditLimit = 10000;
+        this.cardNumber = UUID.randomUUID().toString();
+        this.active = true;
+        this.cardholder = cardholder;
+    }
+
+    public Account(int id, int creditLimit, String cardNumber, boolean active, Cardholder cardholder) {
         this.id = id;
         this.creditLimit = creditLimit;
         this.cardNumber = cardNumber;
         this.active = active;
+        this.cardholder = cardholder;
     }
 
-    public double getCreditLimit() {
+    public int getCreditLimit() {
         return creditLimit;
     }
 
@@ -28,6 +52,10 @@ public class Account {
 
     public boolean isActive() {
         return active;
+    }
+
+    public Cardholder getCardholder() {
+        return cardholder;
     }
 
     @Override

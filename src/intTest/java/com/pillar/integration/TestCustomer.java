@@ -71,7 +71,7 @@ public class TestCustomer {
 
     @After
     public void tearDown() {
-        jdbcTemplate.update("TRUNCATE customer");
+        jdbcTemplate.update("DELETE FROM customer");
     }
 
     private int insertTestCustomer() {

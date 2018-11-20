@@ -23,7 +23,7 @@ public class TestTransaction {
 
     @Test
     public void testTransactionHasGivenProperties() {
-        assertEquals(transaction.getCardNumber(), "1234");
+        assertEquals(transaction.getCreditCardNumber(), "1234");
         assertEquals(transaction.getAmount().doubleValue(), 2, .001);
         assertEquals(transaction.getDateOfTransaction(), new Date());
         assertEquals(transaction.getCustomerId().intValue(), 2);

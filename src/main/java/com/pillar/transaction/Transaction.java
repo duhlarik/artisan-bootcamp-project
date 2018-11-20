@@ -2,32 +2,33 @@ package com.pillar.transaction;
 
 import io.micrometer.core.lang.Nullable;
 
+import javax.persistence.criteria.CriteriaBuilder;
 import java.util.Date;
 
 public class Transaction {
 
-    private String cardNumber;
+    private String creditCardNumber;
     private Double amount;
     private Date dateOfTransaction;
     private Integer customerId;
-    private int creditLimit;
+    private Integer creditLimit;
 
     public Transaction() {}
 
-    public Transaction(String cardNumber, Double amount, Date dateOfTransaction, Integer customerId, @Nullable int creditLimit) {
-        this.cardNumber = cardNumber;
+    public Transaction(String creditCardNumber, Double amount, Date dateOfTransaction, Integer customerId, Integer creditLimit) {
+        this.creditCardNumber = creditCardNumber;
         this.amount = amount;
         this.dateOfTransaction = dateOfTransaction;
         this.customerId = customerId;
         this.creditLimit = creditLimit;
     }
 
-    public String getCardNumber() {
-        return cardNumber;
+    public String getCreditCardNumber() {
+        return creditCardNumber;
     }
 
-    public void setCardNumber(String cardNumber) {
-        this.cardNumber = cardNumber;
+    public void setCreditCardNumber(String cardNumber) {
+        this.creditCardNumber = cardNumber;
     }
 
     public Double getAmount() {
@@ -54,11 +55,11 @@ public class Transaction {
         this.customerId = customerId;
     }
 
-    public int getCreditLimit() {
+    public Integer getCreditLimit() {
         return creditLimit;
     }
 
-    public void setCreditLimit(int creditLimit) {
+    public void setCreditLimit(Integer creditLimit) {
         this.creditLimit = creditLimit;
     }
 }

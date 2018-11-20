@@ -15,8 +15,10 @@ public class Cardholder {
     private String ssn;
     private String name;
 
-    public Cardholder() {
+    public Cardholder() {}
 
+    public Cardholder(String ssn, String name) {
+        this(null, ssn, name);
     }
 
     public Cardholder(Integer id, String ssn, String name) {

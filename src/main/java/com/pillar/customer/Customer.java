@@ -16,6 +16,10 @@ public class Customer {
 
     public Customer() {}
 
+    public Customer(String name) {
+        this(null, name);
+    }
+
     public Customer(Integer id, String name) {
         this.id = id;
         this.name = name;

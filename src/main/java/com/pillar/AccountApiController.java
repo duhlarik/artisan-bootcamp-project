@@ -39,7 +39,7 @@ public class AccountApiController {
         if (cardholderRepository.existsBySsn(ssn)) {
             cardholder = cardholderRepository.findOneBySsn(ssn);
         } else {
-            cardholder = cardholderRepository.save(new Cardholder(null, ssn, name));
+            cardholder = cardholderRepository.save(new Cardholder(ssn, name));
         }
 
         final Customer customer;
@@ -47,7 +47,7 @@ public class AccountApiController {
         if (customerRepository.existsByName(businessName)) {
             customer = customerRepository.findOneByName(businessName);
         } else {
-            customer = customerRepository.save(new Customer(null, businessName));
+            customer = customerRepository.save(new Customer(businessName));
         }
 
         if (!accountRepository.existsByCustomerIdAndCardholderId(customer.getId(), cardholder.getId())) {

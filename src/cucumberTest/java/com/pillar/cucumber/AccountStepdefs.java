@@ -1,16 +1,13 @@
 package com.pillar.cucumber;
 
-import com.mysql.cj.jdbc.MysqlDataSource;
 import com.pillar.AccountApiController;
 import com.pillar.account.Account;
-import cucumber.api.java.After;
 import cucumber.api.java.en.And;
 import cucumber.api.java.en.Given;
 import cucumber.api.java.en.Then;
 import cucumber.api.java.en.When;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.ClientResponse;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -72,7 +69,7 @@ public class AccountStepdefs {
         assertEquals(HttpStatus.FORBIDDEN, status);
     }
 
-    private void requestCreateAccount(){
+    private void requestCreateAccount() {
         final HashMap<String, String> payload = new HashMap<>();
         payload.put(AccountApiController.CARDHOLDER_NAME, cardholderName);
         payload.put(AccountApiController.CARDHOLDER_SSN, ssn);
@@ -88,18 +85,5 @@ public class AccountStepdefs {
 
         status = response.statusCode();
         body = response.bodyToMono(Map.class).block();
-    }
-
-    @After
-    public void tearDown() {
-        MysqlDataSource dataSource = new MysqlDataSource();
-        dataSource.setURL("jdbc:mysql://localhost:3316/cc_processing");
-        dataSource.setUser("root");
-        dataSource.setPassword("password");
-
-        final JdbcTemplate template = new JdbcTemplate(dataSource);
-        template.execute("DELETE FROM account");
-        template.execute("DELETE FROM customer");
-        template.execute("DELETE FROM cardholder");
     }
 }

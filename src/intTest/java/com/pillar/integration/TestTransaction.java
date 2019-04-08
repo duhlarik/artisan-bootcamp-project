@@ -6,7 +6,6 @@ import com.pillar.account.Account;
 import com.pillar.transaction.Transaction;
 import com.pillar.transaction.TransactionRecord;
 import com.pillar.transaction.TransactionRepository;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -14,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -78,13 +78,15 @@ public class TestTransaction {
         createAccount();
         Instant dateOfTransaction = Instant.now().truncatedTo(ChronoUnit.SECONDS);
         TransactionController.TransactionRequest request = new TransactionController.TransactionRequest(account.getCreditCardNumber(), 100.0, dateOfTransaction, "Electronics XYZ");
-        TransactionController.TransactionResponse response = transactionController.createDbTransaction(request);
+        ResponseEntity<TransactionController.TransactionResponse> response = transactionController.createDbTransaction(request);
 
-        TransactionRecord dbTransaction = transactionRepository.findById(response.getTransactionId()).get();
+        TransactionController.TransactionResponse responseBody = response.getBody();
+
+        TransactionRecord dbTransaction = transactionRepository.findById(responseBody.getTransactionId()).get();
         assertEquals(request.getAmount(), dbTransaction.getAmount());
         assertEquals(request.getDateOfTransaction(), dbTransaction.getDateOfTransaction());
         assertEquals(account, dbTransaction.getAccount());
-        assertTrue(response.isApproved());
+        assertTrue(responseBody.isApproved());
         assertTrue(dbTransaction.isApproved());
     }
 
@@ -95,13 +97,5 @@ public class TestTransaction {
         params.put(AccountApiController.BUSINESS_NAME, TEST_BUSINESS);
 
         account = accountApiController.create(params).getBody();
-    }
-
-    @After
-    public void tearDown() {
-        jdbcTemplate.execute("DELETE FROM transaction_record");
-        jdbcTemplate.execute("DELETE FROM account");
-        jdbcTemplate.execute("DELETE FROM cardholder");
-        jdbcTemplate.execute("DELETE FROM customer");
     }
 }

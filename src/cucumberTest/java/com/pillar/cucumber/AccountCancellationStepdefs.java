@@ -3,7 +3,6 @@ package com.pillar.cucumber;
 import com.mysql.cj.jdbc.MysqlDataSource;
 import com.pillar.account.Account;
 import com.pillar.cardholder.Cardholder;
-import cucumber.api.java.After;
 import cucumber.api.java.en.Given;
 import cucumber.api.java.en.Then;
 import cucumber.api.java.en.When;
@@ -22,16 +21,8 @@ public class AccountCancellationStepdefs {
 
     public AccountCancellationStepdefs() {
         endpoint = System.getProperty("integration-endpoint", "http://localhost:8080");
-        dbUrl = System.getProperty("integration-mysql", "jdbc:mysql://localhost:3316/cc_processing");
+        dbUrl = System.getProperty("integration-mysql", "jdbc:mysql://localhost:3316/cc_processing?useSSL=false");
         client = WebClient.create(endpoint);
-    }
-
-    @After
-    public void teardown(){
-        JdbcTemplate template = getJdbcTemplate();
-        template.update("DELETE FROM account");
-        template.update("DELETE FROM customer");
-        template.update("DELETE FROM cardholder");
     }
 
     @Given("an active credit card account")

@@ -27,7 +27,6 @@ public class TestAccount {
     private static final String TEST_CARDHOLDER_NAME = "Steve Goliath";
     private static final String TEST_CARDHOLDER_SSN = "123-45-6789";
     private static final String TEST_BUSINESS = "Target";
-    private final String dbUrl = System.getProperty("integration-mysql", "jdbc:mysql://localhost:3316/cc_processing");
 
     private Account account;
 

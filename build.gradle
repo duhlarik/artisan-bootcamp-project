@@ -31,7 +31,7 @@ targetCompatibility = '1.8'
 
 String integrationTestBaseUrl = "http://localhost:8080"
 String fakeServiceBaseUrl = "http://localhost:5000"
-String integrationTestMysql = "jdbc:mysql://localhost:3316/cc_processing"
+String integrationTestMysql = "jdbc:mysql://localhost:3316/cc_processing?useSSL=false"
 
 addCucumberSuite 'cucumberTest'
 cucumberTest {

@@ -6,3 +6,8 @@ Feature: Transaction
     Given an active card and account
     When a purchase transaction request is made,
     Then success response is returned
+
+  Scenario: A successful V2 transaction is created
+    Given an active card and account
+    When a v2 purchase transaction request is made,
+    Then success response is returned

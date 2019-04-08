@@ -5,11 +5,11 @@ import com.pillar.account.AccountRepository;
 import com.pillar.transaction.Transaction;
 import com.pillar.transaction.TransactionRecord;
 import com.pillar.transaction.TransactionRepository;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.Instant;
-import java.util.Date;
 
 @RestController
 @RequestMapping("/transaction")
@@ -33,11 +33,12 @@ public class TransactionController {
         return new ResponseEntity<>(this.bankService.postTransaction(transaction));
     }
 
-    public TransactionResponse createDbTransaction(TransactionRequest request) {
+    @RequestMapping(path = "/createv2", method = {RequestMethod.POST})
+    public ResponseEntity<TransactionResponse> createDbTransaction(@RequestBody TransactionRequest request) {
         Account account = accountRepository.findByCardNumber(request.getCreditCardNumber());
         TransactionRecord transaction = new TransactionRecord(request.getAmount(), request.dateOfTransaction, true, account);
         transaction = transactionRepository.save(transaction);
-        return new TransactionResponse(transaction.getId(), transaction.isApproved());
+        return new ResponseEntity<>(new TransactionResponse(transaction.getId(), transaction.isApproved()), HttpStatus.CREATED);
     }
 
     public static class TransactionResponse {

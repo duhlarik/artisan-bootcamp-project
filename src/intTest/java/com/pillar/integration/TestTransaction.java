@@ -6,6 +6,7 @@ import com.pillar.account.Account;
 import com.pillar.transaction.Transaction;
 import com.pillar.transaction.TransactionRecord;
 import com.pillar.transaction.TransactionRepository;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -97,5 +98,13 @@ public class TestTransaction {
         params.put(AccountApiController.BUSINESS_NAME, TEST_BUSINESS);
 
         account = accountApiController.create(params).getBody();
+    }
+
+    @After
+    public void tearDown() {
+        jdbcTemplate.execute("DELETE FROM transaction_record");
+        jdbcTemplate.execute("DELETE FROM account");
+        jdbcTemplate.execute("DELETE FROM cardholder");
+        jdbcTemplate.execute("DELETE FROM customer");
     }
 }

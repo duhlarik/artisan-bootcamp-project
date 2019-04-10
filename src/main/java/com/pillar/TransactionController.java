@@ -38,7 +38,13 @@ public class TransactionController {
         Account account = accountRepository.findByCardNumber(request.getCreditCardNumber());
         TransactionRecord transactionRecord = new TransactionRecord(request.getAmount(), request.dateOfTransaction, true, account);
         transactionRecord = transactionRepository.save(transactionRecord);
-        return new ResponseEntity<>(new TransactionResponse(transactionRecord.getId(), transactionRecord.isApproved()), HttpStatus.CREATED);
+        HttpStatus statusCode = HttpStatus.FORBIDDEN;
+
+        if(CreditLimitValidator.validate(request.getAmount(), new Double(account.getCreditLimit()))){
+            statusCode = HttpStatus.CREATED;
+        }
+
+        return new ResponseEntity<>(new TransactionResponse(transactionRecord.getId(), transactionRecord.isApproved()), statusCode);
     }
 
     public static class TransactionResponse {

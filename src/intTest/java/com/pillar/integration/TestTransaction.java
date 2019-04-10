@@ -3,7 +3,7 @@ package com.pillar.integration;
 import com.pillar.AccountApiController;
 import com.pillar.TransactionController;
 import com.pillar.account.Account;
-import com.pillar.transaction.Transaction;
+import com.pillar.transaction.TransactionBankRequest;
 import com.pillar.transaction.TransactionRecord;
 import com.pillar.transaction.TransactionRepository;
 import org.junit.After;
@@ -63,12 +63,12 @@ public class TestTransaction {
 
     @Test
     public void testExternalApiEndpointIsReturnsExpectedResult() {
-        Transaction transaction = new Transaction("1234", 5.00, new Date(), 1, 10000);
+        TransactionBankRequest transactionBankRequest = new TransactionBankRequest("1234", 5.00, new Date(), 1, 10000);
         final ClientResponse response = client
                 .post()
                 .uri("/api/transaction")
                 .contentType(MediaType.APPLICATION_JSON)
-                .body(BodyInserters.fromObject(transaction))
+                .body(BodyInserters.fromObject(transactionBankRequest))
                 .exchange()
                 .block();
         assertEquals(HttpStatus.CREATED, response.statusCode());

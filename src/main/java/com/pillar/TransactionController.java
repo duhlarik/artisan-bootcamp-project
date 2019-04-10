@@ -2,7 +2,7 @@ package com.pillar;
 
 import com.pillar.account.Account;
 import com.pillar.account.AccountRepository;
-import com.pillar.transaction.Transaction;
+import com.pillar.transaction.TransactionBankRequest;
 import com.pillar.transaction.TransactionRecord;
 import com.pillar.transaction.TransactionRepository;
 import org.springframework.http.HttpStatus;
@@ -27,10 +27,10 @@ public class TransactionController {
     }
 
     @RequestMapping(path = "/create", method = {RequestMethod.POST})
-    public ResponseEntity<?> createTransaction(@RequestBody Transaction transaction) {
-        Account account = accountRepository.findByCardNumber(transaction.getCreditCardNumber());
-        transaction.setCreditLimit(account.getCreditLimit());
-        return new ResponseEntity<>(this.bankService.postTransaction(transaction));
+    public ResponseEntity<?> createTransaction(@RequestBody TransactionBankRequest transactionBankRequest) {
+        Account account = accountRepository.findByCardNumber(transactionBankRequest.getCreditCardNumber());
+        transactionBankRequest.setCreditLimit(account.getCreditLimit());
+        return new ResponseEntity<>(this.bankService.postTransaction(transactionBankRequest));
     }
 
     @RequestMapping(path = "/createv2", method = {RequestMethod.POST})

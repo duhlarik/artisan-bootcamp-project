@@ -3,7 +3,7 @@ package com.pillar.cucumber;
 import com.pillar.AccountApiController;
 import com.pillar.TransactionController;
 import com.pillar.account.Account;
-import com.pillar.transaction.Transaction;
+import com.pillar.transaction.TransactionBankRequest;
 import cucumber.api.java.en.Given;
 import cucumber.api.java.en.Then;
 import cucumber.api.java.en.When;
@@ -50,12 +50,12 @@ public class TransactionStepdefs {
 
     @When("a purchase transaction request is made,")
     public void aPurchaseTransactionRequestIsMade() {
-        Transaction transaction = new Transaction(account.getCreditCardNumber(), 2.00, new Date(), 1, account.getCreditLimit());
+        TransactionBankRequest transactionBankRequest = new TransactionBankRequest(account.getCreditCardNumber(), 2.00, new Date(), 1, account.getCreditLimit());
         response = client
                 .post()
-                .uri("/transaction/create")
+                .uri("/transactionBankRequest/create")
                 .contentType(MediaType.APPLICATION_JSON)
-                .body(BodyInserters.fromObject(transaction))
+                .body(BodyInserters.fromObject(transactionBankRequest))
                 .exchange()
                 .block();
     }

@@ -5,7 +5,7 @@ import io.micrometer.core.lang.Nullable;
 import javax.persistence.criteria.CriteriaBuilder;
 import java.util.Date;
 
-public class Transaction {
+public class TransactionBankRequest {
 
     private String creditCardNumber;
     private Double amount;
@@ -13,9 +13,9 @@ public class Transaction {
     private Integer customerId;
     private Integer creditLimit;
 
-    public Transaction() {}
+    public TransactionBankRequest() {}
 
-    public Transaction(String creditCardNumber, Double amount, Date dateOfTransaction, Integer customerId, Integer creditLimit) {
+    public TransactionBankRequest(String creditCardNumber, Double amount, Date dateOfTransaction, Integer customerId, Integer creditLimit) {
         this.creditCardNumber = creditCardNumber;
         this.amount = amount;
         this.dateOfTransaction = dateOfTransaction;

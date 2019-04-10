@@ -1,6 +1,6 @@
 package com.pillar;
 
-import com.pillar.transaction.Transaction;
+import com.pillar.transaction.TransactionBankRequest;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -17,14 +17,14 @@ public class BankService {
     @Value("${bankservice.url}")
     String serviceUrl;
 
-    public HttpStatus postTransaction(Transaction transaction) {
+    public HttpStatus postTransaction(TransactionBankRequest transactionBankRequest) {
         log.info("Bank Service URL: " + serviceUrl);
         WebClient webClient = WebClient.create(serviceUrl);
         final ClientResponse response = webClient
                 .post()
-                .uri("/api/transaction")
+                .uri("/api/transactionBankRequest")
                 .contentType(MediaType.APPLICATION_JSON)
-                .body(BodyInserters.fromObject(transaction))
+                .body(BodyInserters.fromObject(transactionBankRequest))
                 .exchange()
                 .block();
         return response.statusCode();

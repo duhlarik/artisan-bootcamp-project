@@ -3,7 +3,7 @@ package com.pillar;
 import com.pillar.account.Account;
 import com.pillar.account.AccountRepository;
 import com.pillar.cardholder.Cardholder;
-import com.pillar.transaction.Transaction;
+import com.pillar.transaction.TransactionBankRequest;
 import com.pillar.transaction.TransactionRecord;
 import com.pillar.transaction.TransactionRepository;
 import org.junit.Before;
@@ -12,12 +12,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import sun.security.timestamp.TSResponse;
 
-import javax.xml.ws.http.HTTPException;
 import java.time.Instant;
 import java.util.Date;
 
+import static com.pillar.TransactionController.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
@@ -27,6 +26,7 @@ import static org.mockito.Mockito.when;
 public class TestTransactionController {
 
     public static final int CREDIT_LIMIT = 10000;
+    public static final String CARD_NUMBER = "1234";
     private TransactionController controller;
     private MockMvc mockMvc;
     private BankService bankService;
@@ -34,8 +34,8 @@ public class TestTransactionController {
     private Account testAccount;
     private TransactionRepository transactionRepository;
 
-    private Transaction validTransaction;
-    private Transaction invalidTransaction;
+    private TransactionBankRequest validTransactionBankRequest;
+    private TransactionBankRequest invalidTransactionBankRequest;
 
     @Before
     public void setUp() {
@@ -46,13 +46,12 @@ public class TestTransactionController {
         controller = new TransactionController(accountRepository, transactionRepository, bankService);
 
         mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
-        testAccount = new Account(1, CREDIT_LIMIT, "1234", true, new Cardholder());
+        testAccount = new Account(1, CREDIT_LIMIT, CARD_NUMBER, true, new Cardholder());
 
-        String cardNumber = "1234";
-        when(accountRepository.findByCardNumber(cardNumber)).thenReturn(testAccount);
+        when(accountRepository.findByCardNumber(CARD_NUMBER)).thenReturn(testAccount);
 
-        validTransaction = new Transaction("1234", 4.00, new Date(), 9, null);
-        invalidTransaction = new Transaction("1234", 10999.00, new Date(), 9, null);
+        validTransactionBankRequest = new TransactionBankRequest(CARD_NUMBER, 4.00, new Date(), 9, null);
+        invalidTransactionBankRequest = new TransactionBankRequest(CARD_NUMBER, 10999.00, new Date(), 9, null);
     }
 
     @Test
@@ -63,31 +62,42 @@ public class TestTransactionController {
     @Test
     public void transactionControllerReturnsOkStatusCodeForPostRequest() {
         postValidTransaction();
-        ResponseEntity<?> transactionResponse = controller.createTransaction(validTransaction);
+        ResponseEntity<?> transactionResponse = controller.createTransaction(validTransactionBankRequest);
         assertEquals(transactionResponse.getStatusCode(), HttpStatus.CREATED);
     }
 
     @Test
     public void transactionControllerReturnsA403ResponseCodeForInvalidTransaction() {
         postInvalidTransaction();
-        ResponseEntity<?> transactionResponse = controller.createTransaction(invalidTransaction);
+        ResponseEntity<?> transactionResponse = controller.createTransaction(invalidTransactionBankRequest);
         assertEquals(transactionResponse.getStatusCode(), HttpStatus.FORBIDDEN);
     }
 
     private void postValidTransaction() {
-        when(bankService.postTransaction(validTransaction)).thenReturn(HttpStatus.CREATED);
+        when(bankService.postTransaction(validTransactionBankRequest)).thenReturn(HttpStatus.CREATED);
     }
 
     private void postInvalidTransaction() {
-        when(bankService.postTransaction(invalidTransaction)).thenReturn(HttpStatus.FORBIDDEN);
+        when(bankService.postTransaction(invalidTransactionBankRequest)).thenReturn(HttpStatus.FORBIDDEN);
+    }
+
+    @Test
+    public void returns403IfIfRequestAmountGreaterThanCreditLimit() {
+        Double amountGreaterThanLimit = CREDIT_LIMIT + 1.0;
+        TransactionRequest request = new TransactionRequest(CARD_NUMBER, amountGreaterThanLimit, Instant.now(), "Dummy Retailer");
+        when(transactionRepository.save(any())).thenReturn(new TransactionRecord());
+
+        ResponseEntity<?> transactionResponse = controller.createDbTransaction(request);
+
+        assertEquals(HttpStatus.FORBIDDEN, transactionResponse.getStatusCode());
     }
 
     @Test
     public void returns201CreatedWhenAmountLessThanCreditLimit() {
         Double amountLessThanLimit = CREDIT_LIMIT - 1.0;
-        TransactionController.TransactionRequest request = new TransactionController.TransactionRequest("DUMMY", amountLessThanLimit, Instant.now(), "JUNK RETAILER");
-
+        TransactionRequest request = new TransactionRequest(CARD_NUMBER, amountLessThanLimit, Instant.now(), "JUNK RETAILER");
         when(transactionRepository.save(any())).thenReturn(new TransactionRecord());
+
         ResponseEntity<?> transactionResponse = controller.createDbTransaction(request);
 
         assertEquals(HttpStatus.CREATED, transactionResponse.getStatusCode());

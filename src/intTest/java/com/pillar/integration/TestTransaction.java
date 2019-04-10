@@ -89,6 +89,7 @@ public class TestTransaction {
         assertEquals(account, dbTransaction.getAccount());
         assertTrue(responseBody.isApproved());
         assertTrue(dbTransaction.isApproved());
+        assertEquals(HttpStatus.CREATED, response.getStatusCode());
     }
 
     private void createAccount() {

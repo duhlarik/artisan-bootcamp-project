@@ -36,9 +36,9 @@ public class TransactionController {
     @RequestMapping(path = "/createv2", method = {RequestMethod.POST})
     public ResponseEntity<TransactionResponse> createDbTransaction(@RequestBody TransactionRequest request) {
         Account account = accountRepository.findByCardNumber(request.getCreditCardNumber());
-        TransactionRecord transaction = new TransactionRecord(request.getAmount(), request.dateOfTransaction, true, account);
-        transaction = transactionRepository.save(transaction);
-        return new ResponseEntity<>(new TransactionResponse(transaction.getId(), transaction.isApproved()), HttpStatus.CREATED);
+        TransactionRecord transactionRecord = new TransactionRecord(request.getAmount(), request.dateOfTransaction, true, account);
+        transactionRecord = transactionRepository.save(transactionRecord);
+        return new ResponseEntity<>(new TransactionResponse(transactionRecord.getId(), transactionRecord.isApproved()), HttpStatus.CREATED);
     }
 
     public static class TransactionResponse {

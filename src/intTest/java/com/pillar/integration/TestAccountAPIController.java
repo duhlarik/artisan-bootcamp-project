@@ -23,7 +23,7 @@ import static org.junit.Assert.*;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @Rollback
 @RunWith(SpringRunner.class)
-public class TestAccount {
+public class TestAccountAPIController {
     private static final String TEST_CARDHOLDER_NAME = "Steve Goliath";
     private static final String TEST_CARDHOLDER_SSN = "123-45-6789";
     private static final String TEST_BUSINESS = "Target";

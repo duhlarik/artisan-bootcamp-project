@@ -1,6 +1,11 @@
 package com.pillar;
 
+import com.pillar.account.Account;
+import com.pillar.transaction.TransactionRecord;
 import org.junit.Test;
+
+import java.time.Instant;
+import java.util.ArrayList;
 
 import static org.junit.Assert.assertEquals;
 
@@ -36,4 +41,22 @@ public class CreditLimitValidatorTest {
         assertEquals(true, approved);
     }
 
+    @Test
+    public void balanceReturns0GivenEmptyTransactionList() {
+        ArrayList<TransactionRecord> transactionRecordList = new ArrayList<>();
+        double actual = CreditLimitValidator.calculateBalance(transactionRecordList);
+        assertEquals(0.0, actual, 0.001);
+    }
+
+    @Test
+    public void balanceReturnsAmountOfTransactionGivenTransactionRecordListWithOneRecord() {
+        double amount = 10.0;
+        TransactionRecord transactionRecord = new TransactionRecord(amount, Instant.now(), true, new Account());
+        ArrayList<TransactionRecord> transactionRecordList = new ArrayList<>();
+        transactionRecordList.add(transactionRecord);
+
+        double actual = CreditLimitValidator.calculateBalance(transactionRecordList);
+
+        assertEquals(amount, actual, 0.001);
+    }
 }

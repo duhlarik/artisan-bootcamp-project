@@ -10,11 +10,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.Instant;
+import java.util.ArrayList;
 
 @RestController
 @RequestMapping("/transaction")
 public class TransactionController {
 
+    public static final boolean APPROVED = true;
     private AccountRepository accountRepository;
     private TransactionRepository transactionRepository;
 
@@ -35,15 +37,17 @@ public class TransactionController {
 
     @RequestMapping(path = "/createv2", method = {RequestMethod.POST})
     public ResponseEntity<TransactionResponse> createDbTransaction(@RequestBody TransactionRequest request) {
-        Account account = accountRepository.findByCardNumber(request.getCreditCardNumber());
-        TransactionRecord transactionRecord = new TransactionRecord(request.getAmount(), request.dateOfTransaction, true, account);
+        String cardNumber = request.creditCardNumber;
+        Account account = accountRepository.findByCardNumber(cardNumber);
+        double amount = request.getAmount();
+        double creditLimit = account.getCreditLimit();
+        TransactionRecord transactionRecord = new TransactionRecord(amount, request.dateOfTransaction, APPROVED, account);
+        ArrayList<TransactionRecord> transactionRecordList = transactionRepository.findAllByAccount(account);
         transactionRecord = transactionRepository.save(transactionRecord);
-        HttpStatus statusCode = HttpStatus.FORBIDDEN;
 
-        if(CreditLimitValidator.validate(request.getAmount(), new Double(account.getCreditLimit()))){
-            statusCode = HttpStatus.CREATED;
-        }
-
+        HttpStatus statusCode = CreditLimit.validate(transactionRecordList, amount, creditLimit) ?
+                HttpStatus.CREATED :
+                HttpStatus.FORBIDDEN;
         return new ResponseEntity<>(new TransactionResponse(transactionRecord.getId(), transactionRecord.isApproved()), statusCode);
     }
 

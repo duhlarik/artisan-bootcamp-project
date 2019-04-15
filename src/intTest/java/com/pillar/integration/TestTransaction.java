@@ -22,6 +22,7 @@ import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.ClientResponse;
 import org.springframework.web.reactive.function.client.WebClient;
 
+import java.awt.image.PixelGrabber;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
@@ -72,6 +73,21 @@ public class TestTransaction {
                 .exchange()
                 .block();
         assertEquals(HttpStatus.CREATED, response.statusCode());
+    }
+
+    @Test
+    public void returns201CreatedIfSumOfBalanceAndAmountEqualToCreditLimit() {
+        createAccount();
+        Double amount = 10.0;
+        Double balance = account.getCreditLimit() - amount;
+        transactionRepository.save(new TransactionRecord(balance, Instant.now(), true, account));
+        Instant date = Instant.now();
+        TransactionController.TransactionRequest request = new TransactionController.TransactionRequest(account.getCreditCardNumber(), amount, date, "RETAILER");
+
+        ResponseEntity<TransactionController.TransactionResponse> response = transactionController.createDbTransaction(request);
+
+        HttpStatus actual = response.getStatusCode();
+        assertEquals(HttpStatus.CREATED, actual);
     }
 
     @Test

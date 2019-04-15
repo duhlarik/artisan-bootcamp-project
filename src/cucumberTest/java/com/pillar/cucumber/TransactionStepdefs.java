@@ -53,7 +53,7 @@ public class TransactionStepdefs {
         TransactionBankRequest transactionBankRequest = new TransactionBankRequest(account.getCreditCardNumber(), 2.00, new Date(), 1, account.getCreditLimit());
         response = client
                 .post()
-                .uri("/transactionBankRequest/create")
+                .uri("/transaction/create")
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(BodyInserters.fromObject(transactionBankRequest))
                 .exchange()

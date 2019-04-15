@@ -14,6 +14,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Date;
 
 import static com.pillar.TransactionController.*;
@@ -27,8 +28,11 @@ public class TestTransactionController {
 
     public static final int CREDIT_LIMIT = 10000;
     public static final String CARD_NUMBER = "1234";
+    public static final String JUNK_RETAILER = "JUNK RETAILER";
+    public static final double SMALL_AMOUNT = 1.0;
+    public static final boolean APPROVED = true;
+    public static final Instant NOW = Instant.now();
     private TransactionController controller;
-    private MockMvc mockMvc;
     private BankService bankService;
     private AccountRepository accountRepository;
     private Account testAccount;
@@ -45,8 +49,7 @@ public class TestTransactionController {
 
         controller = new TransactionController(accountRepository, transactionRepository, bankService);
 
-        mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
-        testAccount = new Account(1, CREDIT_LIMIT, CARD_NUMBER, true, new Cardholder());
+        testAccount = new Account(1, CREDIT_LIMIT, CARD_NUMBER, APPROVED, new Cardholder());
 
         when(accountRepository.findByCardNumber(CARD_NUMBER)).thenReturn(testAccount);
 
@@ -82,10 +85,14 @@ public class TestTransactionController {
     }
 
     @Test
-    public void returns403IfIfRequestAmountGreaterThanCreditLimit() {
-        Double amountGreaterThanLimit = CREDIT_LIMIT + 1.0;
-        TransactionRequest request = new TransactionRequest(CARD_NUMBER, amountGreaterThanLimit, Instant.now(), "Dummy Retailer");
+    public void returns403IfRequestAmountAndBalanceGreaterThanCreditLimit() {
+        double balance = CREDIT_LIMIT;
+        Double amount = SMALL_AMOUNT;
+        ArrayList<TransactionRecord> transactionRecordList = new ArrayList<>();
+        transactionRecordList.add(new TransactionRecord(balance, NOW, APPROVED, testAccount));
+        TransactionRequest request = new TransactionRequest(CARD_NUMBER, amount, NOW, JUNK_RETAILER);
         when(transactionRepository.save(any())).thenReturn(new TransactionRecord());
+        when(transactionRepository.findAllByAccount(testAccount)).thenReturn(transactionRecordList);
 
         ResponseEntity<?> transactionResponse = controller.createDbTransaction(request);
 
@@ -94,9 +101,24 @@ public class TestTransactionController {
 
     @Test
     public void returns201CreatedWhenAmountLessThanCreditLimit() {
-        Double amountLessThanLimit = CREDIT_LIMIT - 1.0;
-        TransactionRequest request = new TransactionRequest(CARD_NUMBER, amountLessThanLimit, Instant.now(), "JUNK RETAILER");
+        Double amountLessThanLimit = CREDIT_LIMIT - SMALL_AMOUNT;
+        TransactionRequest request = new TransactionRequest(CARD_NUMBER, amountLessThanLimit, NOW, JUNK_RETAILER);
         when(transactionRepository.save(any())).thenReturn(new TransactionRecord());
+
+        ResponseEntity<?> transactionResponse = controller.createDbTransaction(request);
+
+        assertEquals(HttpStatus.CREATED, transactionResponse.getStatusCode());
+    }
+
+    @Test
+    public void returns201CreatedIfBalancePlusTransactionAmountEqualsCreditLimit() {
+        Double balance = CREDIT_LIMIT - SMALL_AMOUNT;
+        Double amount  = SMALL_AMOUNT;
+        ArrayList<TransactionRecord> transactionRecordList = new ArrayList<>();
+        transactionRecordList.add(new TransactionRecord(balance, NOW, APPROVED, testAccount));
+        TransactionRequest request = new TransactionRequest(CARD_NUMBER, amount, NOW, JUNK_RETAILER);
+        when(transactionRepository.save(any())).thenReturn(new TransactionRecord());
+        when(transactionRepository.findAllByAccount(testAccount)).thenReturn(transactionRecordList);
 
         ResponseEntity<?> transactionResponse = controller.createDbTransaction(request);
 

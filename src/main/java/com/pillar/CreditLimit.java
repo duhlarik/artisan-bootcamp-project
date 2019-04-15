@@ -4,7 +4,7 @@ import com.pillar.transaction.TransactionRecord;
 
 import java.util.ArrayList;
 
-public class CreditLimitValidator {
+public class CreditLimit {
     public static boolean validate(Double amount, Double creditLimit) {
         return amount <= creditLimit;
     }
@@ -14,4 +14,9 @@ public class CreditLimitValidator {
                 mapToDouble(tr -> tr.getAmount()).
                 sum();
     }
+
+    public static boolean validate(ArrayList<TransactionRecord> transactionRecordList, double amount, double creditLimit) {
+        return validate(amount + calculateBalance(transactionRecordList), creditLimit);
+    }
+
 }

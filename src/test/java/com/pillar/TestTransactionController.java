@@ -5,13 +5,11 @@ import com.pillar.account.AccountRepository;
 import com.pillar.cardholder.Cardholder;
 import com.pillar.transaction.TransactionBankRequest;
 import com.pillar.transaction.TransactionRecord;
-import com.pillar.transaction.TransactionRepository;
+import com.pillar.transaction.TransactionRecordRepository;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.time.Instant;
 import java.util.ArrayList;
@@ -36,7 +34,7 @@ public class TestTransactionController {
     private BankService bankService;
     private AccountRepository accountRepository;
     private Account testAccount;
-    private TransactionRepository transactionRepository;
+    private TransactionRecordRepository transactionRecordRepository;
 
     private TransactionBankRequest validTransactionBankRequest;
     private TransactionBankRequest invalidTransactionBankRequest;
@@ -44,10 +42,10 @@ public class TestTransactionController {
     @Before
     public void setUp() {
         accountRepository = mock(AccountRepository.class);
-        transactionRepository = mock(TransactionRepository.class);
+        transactionRecordRepository = mock(TransactionRecordRepository.class);
         bankService = mock(BankService.class);
 
-        controller = new TransactionController(accountRepository, transactionRepository, bankService);
+        controller = new TransactionController(accountRepository, transactionRecordRepository, bankService);
 
         testAccount = new Account(1, CREDIT_LIMIT, CARD_NUMBER, APPROVED, new Cardholder());
 
@@ -91,8 +89,8 @@ public class TestTransactionController {
         ArrayList<TransactionRecord> transactionRecordList = new ArrayList<>();
         transactionRecordList.add(new TransactionRecord(balance, NOW, APPROVED, testAccount));
         TransactionRequest request = new TransactionRequest(CARD_NUMBER, amount, NOW, JUNK_RETAILER);
-        when(transactionRepository.save(any())).thenReturn(new TransactionRecord());
-        when(transactionRepository.findAllByAccount(testAccount)).thenReturn(transactionRecordList);
+        when(transactionRecordRepository.save(any())).thenReturn(new TransactionRecord());
+        when(transactionRecordRepository.findAllByAccount(testAccount)).thenReturn(transactionRecordList);
 
         ResponseEntity<?> transactionResponse = controller.createDbTransaction(request);
 
@@ -103,7 +101,7 @@ public class TestTransactionController {
     public void returns201CreatedWhenAmountLessThanCreditLimit() {
         Double amountLessThanLimit = CREDIT_LIMIT - SMALL_AMOUNT;
         TransactionRequest request = new TransactionRequest(CARD_NUMBER, amountLessThanLimit, NOW, JUNK_RETAILER);
-        when(transactionRepository.save(any())).thenReturn(new TransactionRecord());
+        when(transactionRecordRepository.save(any())).thenReturn(new TransactionRecord());
 
         ResponseEntity<?> transactionResponse = controller.createDbTransaction(request);
 
@@ -117,8 +115,8 @@ public class TestTransactionController {
         ArrayList<TransactionRecord> transactionRecordList = new ArrayList<>();
         transactionRecordList.add(new TransactionRecord(balance, NOW, APPROVED, testAccount));
         TransactionRequest request = new TransactionRequest(CARD_NUMBER, amount, NOW, JUNK_RETAILER);
-        when(transactionRepository.save(any())).thenReturn(new TransactionRecord());
-        when(transactionRepository.findAllByAccount(testAccount)).thenReturn(transactionRecordList);
+        when(transactionRecordRepository.save(any())).thenReturn(new TransactionRecord());
+        when(transactionRecordRepository.findAllByAccount(testAccount)).thenReturn(transactionRecordList);
 
         ResponseEntity<?> transactionResponse = controller.createDbTransaction(request);
 

@@ -2,9 +2,10 @@ package com.pillar;
 
 import com.pillar.account.Account;
 import com.pillar.account.AccountRepository;
+import com.pillar.transaction.Transaction;
 import com.pillar.transaction.TransactionBankRequest;
 import com.pillar.transaction.TransactionRecord;
-import com.pillar.transaction.TransactionRepository;
+import com.pillar.transaction.TransactionRecordRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,14 +18,15 @@ import java.util.ArrayList;
 public class TransactionController {
 
     public static final boolean APPROVED = true;
+    private static final Integer FAILED_TRANSACTION_ID = 0;
     private AccountRepository accountRepository;
-    private TransactionRepository transactionRepository;
+    private TransactionRecordRepository transactionRecordRepository;
 
     private BankService bankService;
 
-    public TransactionController(AccountRepository repository, TransactionRepository transactionRepository, BankService bankService){
+    public TransactionController(AccountRepository repository, TransactionRecordRepository transactionRecordRepository, BankService bankService){
         this.accountRepository = repository;
-        this.transactionRepository = transactionRepository;
+        this.transactionRecordRepository = transactionRecordRepository;
         this.bankService = bankService;
     }
 
@@ -37,18 +39,29 @@ public class TransactionController {
 
     @RequestMapping(path = "/createv2", method = {RequestMethod.POST})
     public ResponseEntity<TransactionResponse> createDbTransaction(@RequestBody TransactionRequest request) {
-        String cardNumber = request.creditCardNumber;
-        Account account = accountRepository.findByCardNumber(cardNumber);
-        double amount = request.getAmount();
-        double creditLimit = account.getCreditLimit();
-        TransactionRecord transactionRecord = new TransactionRecord(amount, request.dateOfTransaction, APPROVED, account);
-        ArrayList<TransactionRecord> transactionRecordList = transactionRepository.findAllByAccount(account);
-        transactionRecord = transactionRepository.save(transactionRecord);
+        if(createTransaction(request).isValid()){
+            TransactionRecord transactionRecord = saveTransaction(request);
+            return new ResponseEntity<>(new TransactionResponse(transactionRecord.getId(), transactionRecord.isApproved()),
+                    HttpStatus.CREATED);
+        }else{
+            return new ResponseEntity<>(new TransactionResponse(FAILED_TRANSACTION_ID, APPROVED),
+                    HttpStatus.FORBIDDEN);
+        }
+    }
 
-        HttpStatus statusCode = CreditLimit.validate(transactionRecordList, amount, creditLimit) ?
-                HttpStatus.CREATED :
-                HttpStatus.FORBIDDEN;
-        return new ResponseEntity<>(new TransactionResponse(transactionRecord.getId(), transactionRecord.isApproved()), statusCode);
+    private TransactionRecord saveTransaction(@RequestBody TransactionRequest request) {
+        Account account = accountRepository.findByCardNumber(request.creditCardNumber);
+        TransactionRecord transactionRecord = new TransactionRecord(request.getAmount(), request.dateOfTransaction, APPROVED, account);
+        return transactionRecordRepository.save(transactionRecord);
+    }
+
+    private Transaction createTransaction(TransactionRequest request){
+        Double amount = request.getAmount();
+        Account account = accountRepository.findByCardNumber(request.getCreditCardNumber());
+        double creditLimit = account.getCreditLimit();
+        ArrayList<TransactionRecord> transactionRecordList = transactionRecordRepository.findAllByAccount(account);
+
+        return new Transaction(amount, CreditLimit.calculateBalance(transactionRecordList), creditLimit);
     }
 
     public static class TransactionResponse {
@@ -97,5 +110,7 @@ public class TransactionController {
         public String getRetailer() {
             return retailer;
         }
+
+
     }
 }

@@ -5,7 +5,7 @@ import com.pillar.TransactionController;
 import com.pillar.account.Account;
 import com.pillar.transaction.TransactionBankRequest;
 import com.pillar.transaction.TransactionRecord;
-import com.pillar.transaction.TransactionRepository;
+import com.pillar.transaction.TransactionRecordRepository;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -22,7 +22,6 @@ import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.ClientResponse;
 import org.springframework.web.reactive.function.client.WebClient;
 
-import java.awt.image.PixelGrabber;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
@@ -35,7 +34,7 @@ import static org.junit.Assert.assertTrue;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @Rollback
 @RunWith(SpringRunner.class)
-public class TestTransaction {
+public class TestTransactionController {
     private static final String TEST_CARDHOLDER_NAME = "Steve Goliath";
     private static final String TEST_CARDHOLDER_SSN = "123-45-6789";
     private static final String TEST_BUSINESS = "Target";
@@ -48,7 +47,7 @@ public class TestTransaction {
     private AccountApiController accountApiController;
 
     @Autowired
-    private TransactionRepository transactionRepository;
+    private TransactionRecordRepository transactionRecordRepository;
 
     @Autowired
     JdbcTemplate jdbcTemplate;
@@ -80,7 +79,7 @@ public class TestTransaction {
         createAccount();
         Double amount = 10.0;
         Double balance = account.getCreditLimit() - amount;
-        transactionRepository.save(new TransactionRecord(balance, Instant.now(), true, account));
+        transactionRecordRepository.save(new TransactionRecord(balance, Instant.now(), true, account));
         Instant date = Instant.now();
         TransactionController.TransactionRequest request = new TransactionController.TransactionRequest(account.getCreditCardNumber(), amount, date, "RETAILER");
 
@@ -99,7 +98,7 @@ public class TestTransaction {
 
         TransactionController.TransactionResponse responseBody = response.getBody();
 
-        TransactionRecord dbTransaction = transactionRepository.findById(responseBody.getTransactionId()).get();
+        TransactionRecord dbTransaction = transactionRecordRepository.findById(responseBody.getTransactionId()).get();
         assertEquals(request.getAmount(), dbTransaction.getAmount());
         assertEquals(request.getDateOfTransaction(), dbTransaction.getDateOfTransaction());
         assertEquals(account, dbTransaction.getAccount());

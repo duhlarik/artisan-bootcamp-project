@@ -1,6 +1,3 @@
-# new feature
-# Tags: optional
-    
 Feature: Denying transactions that exceed the credit limit
     
 Scenario: A transaction above the limit is denied

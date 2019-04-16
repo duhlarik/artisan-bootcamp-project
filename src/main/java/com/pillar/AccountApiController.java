@@ -64,4 +64,15 @@ public class AccountApiController {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
+
+    @GetMapping(path = "/{cardNumber}")
+    public ResponseEntity<?> getAccount(@PathVariable String cardNumber) {
+        final Optional<Account> found = accountRepository.findOneByCreditCardNumber(cardNumber);
+        if(found.isPresent()){
+            Account account = found.get();
+            return new ResponseEntity<>(account, HttpStatus.OK);
+        }else{
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
 }

@@ -26,8 +26,4 @@ public class TransactionTest {
         assertEquals(false, expected);
     }
 
-    @Test
-    public void saveCallsTransactionRepositoryWithATransactionRecordMatchingTheTransaction() {
-        
-    }
 }

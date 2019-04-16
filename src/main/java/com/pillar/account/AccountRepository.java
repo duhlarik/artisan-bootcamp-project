@@ -11,6 +11,6 @@ public interface AccountRepository extends JpaRepository<Account, Integer> {
 
     @Query("SELECT a FROM Account a WHERE a.creditCardNumber = :cardNumber")
     Account findByCardNumber(@Param("cardNumber") String cardNumber);
-  
+
     Optional<Account> findOneByCreditCardNumber(String creditCardNumber);
 }

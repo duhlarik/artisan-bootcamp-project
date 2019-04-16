@@ -88,4 +88,8 @@ public class Account {
     public int hashCode() {
         return Objects.hash(id);
     }
+
+    public double getTransactionBalance() {
+        return 0.0;
+    }
 }

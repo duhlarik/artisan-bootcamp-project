@@ -6,6 +6,7 @@ import com.pillar.cardholder.Cardholder;
 import com.pillar.cardholder.CardholderRepository;
 import com.pillar.customer.Customer;
 import com.pillar.customer.CustomerRepository;
+import com.pillar.transaction.TransactionRecordRepository;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -22,6 +23,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 public class TestAccountApiController {
+    public static final double DELTA = 0.001;
     private final Cardholder cardholder = new Cardholder(1, "123-45-6789", "Steve Goliath");
     private final Customer customer = new Customer(1, "Target");
 
@@ -80,6 +82,11 @@ public class TestAccountApiController {
     @Test
     public void cardholderHasName() {
         assertEquals(cardholder.getName(), account.getCardholder().getName());
+    }
+
+    @Test
+    public void accountHas0TransactionBalanceBeforeAnyTransactionsAreMade() {
+        assertEquals(0, account.getTransactionBalance(), DELTA);
     }
 
     @Test

@@ -34,6 +34,8 @@ public class Account {
 
     @Transient
     private double transactionBalance = 0;
+    @Transient
+    private double chargeBalance = 0;
 
     public Account() {}
 
@@ -100,6 +102,10 @@ public class Account {
     }
 
     public double getChargeBalance() {
-        return 0;
+        return chargeBalance;
+    }
+
+    public void setChargeBalance(double amount) {
+        chargeBalance = amount;
     }
 }

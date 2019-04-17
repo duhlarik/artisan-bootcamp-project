@@ -9,6 +9,6 @@ public class ChargeTransactionRecord extends TransactionRecord {
     private static final boolean APPROVED = true;
 
     public ChargeTransactionRecord(double chargeAmount) {
-        super(chargeAmount, Instant.now(), APPROVED, new Account() );
+        super(chargeAmount, Instant.now(), APPROVED, new Account(), true );
     }
 }

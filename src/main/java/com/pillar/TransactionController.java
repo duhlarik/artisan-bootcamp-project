@@ -17,7 +17,7 @@ import java.util.ArrayList;
 @RequestMapping("/transaction")
 public class TransactionController {
 
-    public static final boolean APPROVED = true;
+    private static final boolean APPROVED = true;
     private static final Integer FAILED_TRANSACTION_ID = 0;
     private AccountRepository accountRepository;
     private TransactionRecordRepository transactionRecordRepository;
@@ -51,7 +51,7 @@ public class TransactionController {
 
     private TransactionRecord saveTransaction(@RequestBody TransactionRequest request) {
         Account account = accountRepository.findByCardNumber(request.creditCardNumber);
-        TransactionRecord transactionRecord = new TransactionRecord(request.getAmount(), request.dateOfTransaction, APPROVED, account);
+        TransactionRecord transactionRecord = new TransactionRecord(request.getAmount(), request.dateOfTransaction, APPROVED, account, request.isCharge());
         return transactionRecordRepository.save(transactionRecord);
     }
 
@@ -89,12 +89,22 @@ public class TransactionController {
         private Double amount;
         private Instant dateOfTransaction;
         private String retailer;
+        private boolean isCharge;
 
         public TransactionRequest(String creditCardNumber, Double amount, Instant dateOfTransaction, String retailer) {
             this.creditCardNumber = creditCardNumber;
             this.amount = amount;
             this.dateOfTransaction = dateOfTransaction;
             this.retailer = retailer;
+            this.isCharge = true;
+        }
+
+        public TransactionRequest(String creditCardNumber, double amount, Instant dateOfTransaction, String retailer, boolean isCharge) {
+            this.creditCardNumber = creditCardNumber;
+            this.amount = amount;
+            this.dateOfTransaction = dateOfTransaction;
+            this.retailer = retailer;
+            this.isCharge = isCharge;
         }
 
         public String getCreditCardNumber() {
@@ -114,6 +124,9 @@ public class TransactionController {
         }
 
 
+        public boolean isCharge() {
+            return isCharge;
+        }
     }
 
     public static class ChargeTransactionRequest extends TransactionRequest {

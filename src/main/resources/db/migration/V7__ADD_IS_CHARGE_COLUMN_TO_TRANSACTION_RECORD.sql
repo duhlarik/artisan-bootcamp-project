@@ -1,0 +1,1 @@
+ALTER TABLE transaction_record ADD COLUMN is_charge BOOLEAN NOT NULL DEFAULT TRUE;

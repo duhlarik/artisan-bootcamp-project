@@ -56,19 +56,16 @@ public class TestTransactionRecordRepository {
         assertEquals(isCharge, outputTxRecord.isCharge());
     }
 
-//    @Test
-//    public void findAllChargeTransactionsByAccountReturnsOnlyTransactionsWithChargeSetToTrueGivenMixOfTransactions() {
-//        createAccount();
-//        TransactionRecord chargeTx = new TransactionRecord(AMOUNT, NOW, APPROVED, account);
-//        TransactionRecord authorizationTx = new TransactionRecord(AMOUNT, NOW, APPROVED, account, IS_CHARGE);
-//        transactionRecordRepository.save(chargeTx);
-//        transactionRecordRepository.save(authorizationTx);
-//
-//        ArrayList<TransactionRecord> expected = transactionRecordRepository.findAllChargesByAccount(account);
-//
-//        int numberOfTransactionsToBeReturned = 1;
-//        assertEquals(numberOfTransactionsToBeReturned, expected.size());
-//    }
+    @Test
+    public void transactionFromRepositoryHasIsChargeSetToTrueWhenTransactionSavedHadIsChargeTrue() {
+        createAccount();
+        boolean isCharge = true;
+
+        TransactionRecord inputTxRecord = new TransactionRecord(5.0, Instant.now(), true, account, isCharge);
+        TransactionRecord outputTxRecord = transactionRecordRepository.save(inputTxRecord);
+
+        assertEquals(isCharge, outputTxRecord.isCharge());
+    }
 
     private ArrayList<TransactionRecord> list(TransactionRecord...records){
         ArrayList<TransactionRecord> returnValue = new ArrayList<>();

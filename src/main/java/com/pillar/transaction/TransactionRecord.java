@@ -15,6 +15,7 @@ public class TransactionRecord {
     private Double amount;
     private Instant dateOfTransaction;
     private boolean approved;
+    private boolean isCharge;
 
     @ManyToOne
     @JoinColumn(name = "account_id")
@@ -34,6 +35,7 @@ public class TransactionRecord {
         this.dateOfTransaction = date;
         this.approved = approved;
         this.account = account;
+        this.isCharge = isCharge;
     }
 
     public Integer getId() {
@@ -57,6 +59,6 @@ public class TransactionRecord {
     }
 
     public boolean isCharge() {
-        return false;
+        return isCharge;
     }
 }

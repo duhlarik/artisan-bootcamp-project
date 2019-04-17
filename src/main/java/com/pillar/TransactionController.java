@@ -51,7 +51,7 @@ public class TransactionController {
 
     private TransactionRecord saveTransaction(@RequestBody TransactionRequest request) {
         Account account = accountRepository.findByCardNumber(request.creditCardNumber);
-        TransactionRecord transactionRecord = new TransactionRecord(request.getAmount(), request.dateOfTransaction, APPROVED, account);
+        TransactionRecord transactionRecord = new TransactionRecord(request.getAmount(), request.dateOfTransaction, APPROVED, account, true);
         return transactionRecordRepository.save(transactionRecord);
     }
 

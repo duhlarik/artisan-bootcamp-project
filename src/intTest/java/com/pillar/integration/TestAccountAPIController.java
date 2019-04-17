@@ -33,6 +33,8 @@ public class TestAccountAPIController {
     private static final String TEST_CARDHOLDER_NAME = "Steve Goliath";
     private static final String TEST_CARDHOLDER_SSN = "123-45-6789";
     private static final String TEST_BUSINESS = "Target";
+    private static final String RETAILER = "";
+    private static final Instant NOW = Instant.now();
 
     private Account account;
 
@@ -53,6 +55,7 @@ public class TestAccountAPIController {
 
     @Autowired
     JdbcTemplate jdbcTemplate;
+
 
     @Test
     public void createsNewCardholder() {
@@ -133,13 +136,30 @@ public class TestAccountAPIController {
     public void getAccountReturnsAccountWithTransactionBalanceEqualToChargeAmountGivenChargeTransactionOfChargeAmount() {
         createAccount();
         double chargeAmount = 5.0;
-        String cardNumber = account.getCreditCardNumber();
-        transactionController.createDbTransaction(new TransactionRequest(cardNumber, chargeAmount, Instant.now(), "" ));
+        String creditCardNumber = account.getCreditCardNumber();
+        transactionController.createDbTransaction(new TransactionRequest(creditCardNumber, chargeAmount, NOW, RETAILER ));
 
-        Account responseAccount = controller.getAccount(cardNumber).getBody();
+        Account responseAccount = controller.getAccount(creditCardNumber).getBody();
 
-        double expected = responseAccount.getTransactionBalance();
-        assertEquals(chargeAmount, expected, 0.001);
+        assertEquals(chargeAmount, responseAccount.getTransactionBalance(), 0.001);
+    }
+
+    @Test
+    public void getAccountReturnsAccountWithTransactionBalanceEqualToSumOfChargesGiven2Transactions() {
+        createAccount();
+        double charge1 = 1.0;
+        double charge2 = 2.0;
+        String creditCardNumber = account.getCreditCardNumber();
+        createChargeTransaction(creditCardNumber, charge1);
+        createChargeTransaction(creditCardNumber, charge2);
+
+        ResponseEntity<Account> entity = controller.getAccount(creditCardNumber);
+
+        assertEquals(charge1+charge2, entity.getBody().getTransactionBalance(), 0.001);
+    }
+
+    private void createChargeTransaction(String creditCardNumber, double charge1) {
+        transactionController.createDbTransaction(new TransactionRequest(creditCardNumber, charge1, Instant.now(), RETAILER));
     }
 
     @After

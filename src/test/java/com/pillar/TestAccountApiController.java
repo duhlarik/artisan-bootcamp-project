@@ -44,7 +44,9 @@ public class TestAccountApiController {
         when(repository.existsByCustomerIdAndCardholderId(anyInt(), anyInt())).thenReturn(false);
         when(repository.save(any())).thenReturn(new Account(cardholder, customer));
 
-        controller = new AccountApiController(repository, cardholderRepository, customerRepository);
+        final TransactionRecordRepository transactionRepository = mock(TransactionRecordRepository.class);
+
+        controller = new AccountApiController(repository, cardholderRepository, customerRepository, transactionRepository);
         createAccount();
     }
 

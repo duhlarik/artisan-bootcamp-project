@@ -7,6 +7,7 @@ import com.pillar.cardholder.CardholderRepository;
 import com.pillar.customer.Customer;
 import com.pillar.customer.CustomerRepository;
 import com.pillar.transaction.TransactionRecord;
+import com.pillar.transaction.TransactionRecordRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -27,11 +28,13 @@ public class AccountApiController {
     private final AccountRepository accountRepository;
     private final CardholderRepository cardholderRepository;
     private final CustomerRepository customerRepository;
+    private final TransactionRecordRepository transactionRecordRepository;
 
-    public AccountApiController(AccountRepository accountRepository, CardholderRepository cardholderRepository, CustomerRepository customerRepository) {
+    public AccountApiController(AccountRepository accountRepository, CardholderRepository cardholderRepository, CustomerRepository customerRepository, TransactionRecordRepository transactionRepository) {
         this.accountRepository = accountRepository;
         this.cardholderRepository = cardholderRepository;
         this.customerRepository = customerRepository;
+        transactionRecordRepository = transactionRepository;
     }
 
     @RequestMapping(method = {RequestMethod.POST})
@@ -72,7 +75,8 @@ public class AccountApiController {
         final Optional<Account> found = accountRepository.findOneByCreditCardNumber(cardNumber);
         if(found.isPresent()){
             Account account = found.get();
-            account.setTransactionBalance(5.0);
+            ArrayList<TransactionRecord> transactionRecordList = this.transactionRecordRepository.findAllByAccount(account);
+            account.setTransactionBalance(BalanceCalculator.transactionBalance(transactionRecordList));
             return new ResponseEntity<>(account, HttpStatus.OK);
         }else{
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);

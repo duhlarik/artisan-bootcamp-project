@@ -15,11 +15,10 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @Rollback
@@ -31,7 +30,6 @@ public class TestTransactionRecordRepository {
     private static final Double AMOUNT = 5.0;
     private static final Instant NOW = Instant.now();
     private static final boolean APPROVED = true;
-    private static final boolean IS_CHARGE = false;
 
     @Autowired
     private TransactionRecordRepository transactionRecordRepository;
@@ -49,7 +47,7 @@ public class TestTransactionRecordRepository {
         createAccount();
         boolean isCharge = false;
 
-        TransactionRecord inputTxRecord = new TransactionRecord(5.0, Instant.now(), true, account, isCharge);
+        TransactionRecord inputTxRecord = new TransactionRecord(AMOUNT, NOW, APPROVED, account, isCharge);
         TransactionRecord outputTxRecord = transactionRecordRepository.save(inputTxRecord);
 
         assertEquals(isCharge, outputTxRecord.isCharge());
@@ -60,7 +58,7 @@ public class TestTransactionRecordRepository {
         createAccount();
         boolean isCharge = true;
 
-        TransactionRecord inputTxRecord = new TransactionRecord(5.0, Instant.now(), true, account, isCharge);
+        TransactionRecord inputTxRecord = new TransactionRecord(AMOUNT, NOW, APPROVED, account, isCharge);
         TransactionRecord outputTxRecord = transactionRecordRepository.save(inputTxRecord);
 
         assertEquals(isCharge, outputTxRecord.isCharge());
@@ -69,19 +67,13 @@ public class TestTransactionRecordRepository {
     @Test
     public void findAllByAccountAndIsChargeTrueTransactionsByAccountReturnsOnlyChargeTransactionsCreated() {
         createAccount();
-        transactionRecordRepository.save(new TransactionRecord(5.0, Instant.now(), true, account, true));
-        transactionRecordRepository.save(new TransactionRecord(5.0, Instant.now(), true, account, false));
+        transactionRecordRepository.save(new TransactionRecord(AMOUNT, NOW, APPROVED, account, true));
+        transactionRecordRepository.save(new TransactionRecord(AMOUNT, NOW, APPROVED, account, false));
 
         ArrayList<TransactionRecord> expected = transactionRecordRepository.findAllByAccountAndIsChargeTrue(account);
 
         int numberOfTransactionsToBeReturned = 1;
         assertEquals(numberOfTransactionsToBeReturned, expected.size());
-    }
-
-    private ArrayList<TransactionRecord> list(TransactionRecord...records){
-        ArrayList<TransactionRecord> returnValue = new ArrayList<>();
-        Collections.addAll(returnValue, records);
-        return returnValue;
     }
 
     private void createAccount() {

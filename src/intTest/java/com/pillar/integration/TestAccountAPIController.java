@@ -168,6 +168,26 @@ public class TestAccountAPIController {
         assertEquals(0, entity.getBody().getChargeBalance(), TransactionRecord.DELTA);
     }
 
+    @Test
+    public void getAccountReturnsAccountWithChargeBalanceEqualToAmountOfChargeTransactionGiven() {
+        createAccount();
+        String creditCardNumber = account.getCreditCardNumber();
+        double charge2 = 2.0;
+        double auth = 1.0;
+        createChargeTransaction(creditCardNumber, charge2);
+
+        ResponseEntity<Account> entity = controller.getAccount(creditCardNumber);
+
+        assertEquals(charge2, entity.getBody().getChargeBalance(), TransactionRecord.DELTA);
+    }
+//
+//    private void createAuthorizationTransaction(String creditCardNumber, double amount) {
+//        TransactionRequest request = new TransactionRequest(creditCardNumber, amount, Instant.now(), RETAILER);
+//        request.isCharge = false;
+//        transactionController.createDbTransaction(request);
+//    }
+//
+
     private void createChargeTransaction(String creditCardNumber, double charge1) {
         transactionController.createDbTransaction(new TransactionRequest(creditCardNumber, charge1, Instant.now(), RETAILER));
     }

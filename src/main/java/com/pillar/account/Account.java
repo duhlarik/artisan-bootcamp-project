@@ -33,6 +33,9 @@ public class Account {
     @JoinColumn(name = "customer_id")
     private Customer customer;
 
+    @Transient
+    private double transactionBalance = 0;
+
     public Account() {}
 
     public Account(Cardholder cardholder, Customer customer) {
@@ -90,6 +93,10 @@ public class Account {
     }
 
     public double getTransactionBalance() {
-        return 0.0;
+        return transactionBalance;
+    }
+
+    public void setTransactionBalance(double amount) {
+        transactionBalance = amount;
     }
 }

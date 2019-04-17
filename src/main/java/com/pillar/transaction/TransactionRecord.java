@@ -29,6 +29,13 @@ public class TransactionRecord {
         this.account = account;
     }
 
+    public TransactionRecord(double amount, Instant date, boolean approved, Account account, boolean isCharge) {
+        this.amount = amount;
+        this.dateOfTransaction = date;
+        this.approved = approved;
+        this.account = account;
+    }
+
     public Integer getId() {
         return id;
     }
@@ -47,5 +54,9 @@ public class TransactionRecord {
 
     public boolean isApproved() {
         return approved;
+    }
+
+    public boolean isCharge() {
+        return false;
     }
 }

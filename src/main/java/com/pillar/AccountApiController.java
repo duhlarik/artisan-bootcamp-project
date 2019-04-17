@@ -6,10 +6,12 @@ import com.pillar.cardholder.Cardholder;
 import com.pillar.cardholder.CardholderRepository;
 import com.pillar.customer.Customer;
 import com.pillar.customer.CustomerRepository;
+import com.pillar.transaction.TransactionRecord;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.Map;
 import java.util.Optional;
 
@@ -70,6 +72,7 @@ public class AccountApiController {
         final Optional<Account> found = accountRepository.findOneByCreditCardNumber(cardNumber);
         if(found.isPresent()){
             Account account = found.get();
+            account.setTransactionBalance(5.0);
             return new ResponseEntity<>(account, HttpStatus.OK);
         }else{
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);

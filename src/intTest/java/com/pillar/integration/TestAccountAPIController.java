@@ -40,6 +40,9 @@ public class TestAccountAPIController {
     private AccountApiController controller;
 
     @Autowired
+    private TransactionController transactionController;
+
+    @Autowired
     private CustomerRepository customerRepository;
 
     @Autowired
@@ -126,8 +129,22 @@ public class TestAccountAPIController {
         account = controller.create(params).getBody();
     }
 
+    @Test
+    public void getAccountReturnsAccountWithTransactionBalanceEqualToChargeAmountGivenChargeTransactionOfChargeAmount() {
+        createAccount();
+        double chargeAmount = 5.0;
+        String cardNumber = account.getCreditCardNumber();
+        transactionController.createDbTransaction(new TransactionRequest(cardNumber, chargeAmount, Instant.now(), "" ));
+
+        Account responseAccount = controller.getAccount(cardNumber).getBody();
+
+        double expected = responseAccount.getTransactionBalance();
+        assertEquals(chargeAmount, expected, 0.001);
+    }
+
     @After
     public void tearDown() {
+        jdbcTemplate.execute("DELETE FROM transaction_record");
         jdbcTemplate.execute("DELETE FROM account");
         jdbcTemplate.execute("DELETE FROM cardholder");
         jdbcTemplate.execute("DELETE FROM customer");

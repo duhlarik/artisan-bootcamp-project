@@ -13,10 +13,11 @@ import static org.junit.Assert.assertEquals;
 
 public class TestBalanceCalculator {
     private static final Instant NOW = Instant.now();
+    private static final Account ACCOUNT = new Account();
 
     @Test
     public void transactionBalanceReturns5GivenASingleTransactionRecordOf5() {
-        TransactionRecord tran = new TransactionRecord(5.0, NOW, APPROVED, new Account());
+        TransactionRecord tran = new TransactionRecord(5.0, NOW, APPROVED, ACCOUNT);
 
         double expected = BalanceCalculator.transactionBalance(list(tran));
 
@@ -32,14 +33,16 @@ public class TestBalanceCalculator {
 
     @Test
     public void transactionBalanceReturns5GivenASingleAuthorizationTransactionRecordOf5() {
-        TransactionRecord authTransaction = new AuthorizationTransactionRecord(5.0);
+        TransactionRecord authTransaction = new TransactionRecord(5.0, NOW, APPROVED, ACCOUNT, false);
+
         double expected = BalanceCalculator.transactionBalance(list(authTransaction));
+
         assertEquals(5.0, expected, 0.001);
     }
 
     @Test
     public void chargeBalanceReturns0GivenSingleAuthorizationTransactionOf5() {
-        TransactionRecord authTransaction = new AuthorizationTransactionRecord(5.0);
+        TransactionRecord authTransaction = new TransactionRecord(5.0, NOW, APPROVED, ACCOUNT, false);
 
         double expected = BalanceCalculator.chargeBalance(list(authTransaction));
 
@@ -49,8 +52,8 @@ public class TestBalanceCalculator {
     @Test
     public void chargeBalanceReturnsChargeAmountGivenChargeAndAuthorizationTransactionRecords() {
         double chargeAmount = 5.0;
-        ChargeTransactionRecord chargeTransaction = new ChargeTransactionRecord(chargeAmount);
-        AuthorizationTransactionRecord authTransaction = new AuthorizationTransactionRecord(1.0);
+        TransactionRecord chargeTransaction = new TransactionRecord(chargeAmount, NOW, APPROVED, ACCOUNT, true);
+        TransactionRecord authTransaction = new TransactionRecord(1.0, NOW, APPROVED, ACCOUNT, false);
 
         double expected = BalanceCalculator.chargeBalance(list(chargeTransaction, authTransaction));
 

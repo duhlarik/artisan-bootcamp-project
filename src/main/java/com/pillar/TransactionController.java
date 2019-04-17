@@ -8,10 +8,15 @@ import com.pillar.transaction.TransactionRecord;
 import com.pillar.transaction.TransactionRecordRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.time.Instant;
 import java.util.ArrayList;
+
+import static com.pillar.BalanceCalculator.transactionBalance;
 
 @RestController
 @RequestMapping("/transaction")
@@ -61,9 +66,7 @@ public class TransactionController {
         double creditLimit = account.getCreditLimit();
         ArrayList<TransactionRecord> transactionRecordList = transactionRecordRepository.findAllByAccount(account);
 
-        return new Transaction(amount, transactionRecordList.stream().
-                mapToDouble(tr -> tr.getAmount()).
-                sum(), creditLimit);
+        return new Transaction(amount, transactionBalance(transactionRecordList), creditLimit);
     }
 
     public static class TransactionResponse {
@@ -110,16 +113,7 @@ public class TransactionController {
             return dateOfTransaction;
         }
 
-        public String getRetailer() {
-            return retailer;
-        }
-
 
     }
 
-    public static class ChargeTransactionRequest extends TransactionRequest {
-        public ChargeTransactionRequest(String cardNumber, double chargeAmount) {
-            super(cardNumber, chargeAmount, Instant.now(), "RETAILER");
-        }
-    }
 }

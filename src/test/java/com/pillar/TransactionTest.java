@@ -1,5 +1,6 @@
-package com.pillar.transaction;
+package com.pillar;
 
+import com.pillar.transaction.Transaction;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;

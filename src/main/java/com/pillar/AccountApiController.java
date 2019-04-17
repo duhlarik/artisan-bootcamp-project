@@ -66,7 +66,7 @@ public class AccountApiController {
     }
 
     @GetMapping(path = "/{cardNumber}")
-    public ResponseEntity<?> getAccount(@PathVariable String cardNumber) {
+    public ResponseEntity<Account> getAccount(@PathVariable String cardNumber) {
         final Optional<Account> found = accountRepository.findOneByCreditCardNumber(cardNumber);
         if(found.isPresent()){
             Account account = found.get();

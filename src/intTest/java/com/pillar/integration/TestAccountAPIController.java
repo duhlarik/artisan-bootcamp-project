@@ -1,10 +1,12 @@
 package com.pillar.integration;
 
 import com.pillar.AccountApiController;
+import com.pillar.TransactionController;
 import com.pillar.account.Account;
 import com.pillar.account.AccountRepository;
 import com.pillar.cardholder.CardholderRepository;
 import com.pillar.customer.CustomerRepository;
+import com.pillar.transaction.TransactionRecordRepository;
 import org.junit.After;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -16,10 +18,12 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
+import static com.pillar.TransactionController.*;
 import static org.junit.Assert.*;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)

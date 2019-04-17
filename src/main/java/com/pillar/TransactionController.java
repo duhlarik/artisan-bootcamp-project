@@ -61,7 +61,9 @@ public class TransactionController {
         double creditLimit = account.getCreditLimit();
         ArrayList<TransactionRecord> transactionRecordList = transactionRecordRepository.findAllByAccount(account);
 
-        return new Transaction(amount, CreditLimit.calculateBalance(transactionRecordList), creditLimit);
+        return new Transaction(amount, transactionRecordList.stream().
+                mapToDouble(tr -> tr.getAmount()).
+                sum(), creditLimit);
     }
 
     public static class TransactionResponse {
@@ -112,5 +114,11 @@ public class TransactionController {
         }
 
 
+    }
+
+    public static class ChargeTransactionRequest extends TransactionRequest {
+        public ChargeTransactionRequest(String cardNumber, double chargeAmount) {
+            super(cardNumber, chargeAmount, Instant.now(), "RETAILER");
+        }
     }
 }

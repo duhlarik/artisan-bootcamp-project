@@ -99,4 +99,8 @@ public class Account {
     public void setTransactionBalance(double amount) {
         transactionBalance = amount;
     }
+
+    public double getChargeBalance() {
+        return 0;
+    }
 }

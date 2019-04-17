@@ -7,6 +7,7 @@ import java.time.Instant;
 
 @Entity
 public class TransactionRecord {
+    public static final double DELTA = 0.001;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;

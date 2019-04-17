@@ -6,7 +6,7 @@ import com.pillar.account.Account;
 import com.pillar.account.AccountRepository;
 import com.pillar.cardholder.CardholderRepository;
 import com.pillar.customer.CustomerRepository;
-import com.pillar.transaction.TransactionRecordRepository;
+import com.pillar.transaction.TransactionRecord;
 import org.junit.After;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -23,7 +23,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
-import static com.pillar.TransactionController.*;
+import static com.pillar.TransactionController.TransactionRequest;
 import static org.junit.Assert.*;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -156,6 +156,16 @@ public class TestAccountAPIController {
         ResponseEntity<Account> entity = controller.getAccount(creditCardNumber);
 
         assertEquals(charge1+charge2, entity.getBody().getTransactionBalance(), 0.001);
+    }
+
+    @Test
+    public void getAccountReturnsAccountWithChargeBalanceEqualToZeroWhenNoTransactionsGiven() {
+        createAccount();
+        String creditCardNumber = account.getCreditCardNumber();
+
+        ResponseEntity<Account> entity = controller.getAccount(creditCardNumber);
+
+        assertEquals(0, entity.getBody().getChargeBalance(), TransactionRecord.DELTA);
     }
 
     private void createChargeTransaction(String creditCardNumber, double charge1) {

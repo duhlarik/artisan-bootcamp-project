@@ -20,6 +20,12 @@ services:
       MYSQL_ROOT_PASSWORD: 'password'
       MYSQL_DATABASE: 'cc_processing'
 
+  mongodb:
+    image: 'mongo:latest'
+    restart: always
+    ports:
+      - "27017:27017"
+
   fake-bank-service:
     image: 'com.pillar/fake-bank-service'
     ports:

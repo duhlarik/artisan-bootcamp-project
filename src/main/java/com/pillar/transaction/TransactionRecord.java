@@ -24,18 +24,19 @@ public class TransactionRecord {
     public TransactionRecord() {}
 
     public TransactionRecord(Double amount, Instant dateOfTransaction, boolean approved, Account account) {
+        setFields(amount, dateOfTransaction, approved, account);
+    }
+
+    public TransactionRecord(double amount, Instant date, boolean approved, Account account, boolean isCharge) {
+        setFields(amount, date, approved, account);
+        this.isCharge = isCharge;
+    }
+
+    private void setFields(Double amount, Instant dateOfTransaction, boolean approved, Account account) {
         this.amount = amount;
         this.dateOfTransaction = dateOfTransaction;
         this.approved = approved;
         this.account = account;
-    }
-
-    public TransactionRecord(double amount, Instant date, boolean approved, Account account, boolean isCharge) {
-        this.amount = amount;
-        this.dateOfTransaction = date;
-        this.approved = approved;
-        this.account = account;
-        this.isCharge = isCharge;
     }
 
     public Integer getId() {

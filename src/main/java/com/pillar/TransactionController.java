@@ -13,6 +13,8 @@ import org.springframework.web.bind.annotation.*;
 import java.time.Instant;
 import java.util.ArrayList;
 
+import static com.pillar.BalanceCalculator.*;
+
 @RestController
 @RequestMapping("/transaction")
 public class TransactionController {
@@ -61,9 +63,7 @@ public class TransactionController {
         double creditLimit = account.getCreditLimit();
         ArrayList<TransactionRecord> transactionRecordList = transactionRecordRepository.findAllByAccount(account);
 
-        return new Transaction(amount, transactionRecordList.stream().
-                mapToDouble(tr -> tr.getAmount()).
-                sum(), creditLimit);
+        return new Transaction(amount, transactionBalance(transactionRecordList), creditLimit);
     }
 
     public static class TransactionResponse {
@@ -92,18 +92,19 @@ public class TransactionController {
         private boolean isCharge;
 
         public TransactionRequest(String creditCardNumber, Double amount, Instant dateOfTransaction, String retailer) {
-            this.creditCardNumber = creditCardNumber;
-            this.amount = amount;
-            this.dateOfTransaction = dateOfTransaction;
-            this.retailer = retailer;
+            setFields(creditCardNumber, amount, dateOfTransaction, retailer);
             this.isCharge = true;
         }
 
-        public TransactionRequest(String creditCardNumber, double amount, Instant dateOfTransaction, String retailer, boolean isCharge) {
+        private void setFields(String creditCardNumber, Double amount, Instant dateOfTransaction, String retailer) {
             this.creditCardNumber = creditCardNumber;
             this.amount = amount;
             this.dateOfTransaction = dateOfTransaction;
             this.retailer = retailer;
+        }
+
+        public TransactionRequest(String creditCardNumber, double amount, Instant dateOfTransaction, String retailer, boolean isCharge) {
+            setFields(creditCardNumber, amount, dateOfTransaction, retailer);
             this.isCharge = isCharge;
         }
 
@@ -119,19 +120,10 @@ public class TransactionController {
             return dateOfTransaction;
         }
 
-        public String getRetailer() {
-            return retailer;
-        }
-
 
         public boolean isCharge() {
             return isCharge;
         }
     }
 
-    public static class ChargeTransactionRequest extends TransactionRequest {
-        public ChargeTransactionRequest(String cardNumber, double chargeAmount) {
-            super(cardNumber, chargeAmount, Instant.now(), "RETAILER");
-        }
-    }
 }

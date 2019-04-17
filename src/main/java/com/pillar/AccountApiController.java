@@ -16,6 +16,8 @@ import java.util.ArrayList;
 import java.util.Map;
 import java.util.Optional;
 
+import static com.pillar.BalanceCalculator.*;
+
 @RestController
 @RequestMapping("/api/account")
 public class AccountApiController {
@@ -75,9 +77,9 @@ public class AccountApiController {
         final Optional<Account> found = accountRepository.findOneByCreditCardNumber(cardNumber);
         if(found.isPresent()){
             Account account = found.get();
-            ArrayList<TransactionRecord> transactionRecordList = this.transactionRecordRepository.findAllByAccount(account);
-            account.setTransactionBalance(BalanceCalculator.transactionBalance(transactionRecordList));
-            account.setChargeBalance(BalanceCalculator.chargeBalance(transactionRecordList));
+            ArrayList<TransactionRecord> txRecordList = this.transactionRecordRepository.findAllByAccount(account);
+            account.setTransactionBalance(transactionBalance(txRecordList));
+            account.setChargeBalance(chargeBalance(txRecordList));
             return new ResponseEntity<>(account, HttpStatus.OK);
         }else{
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);

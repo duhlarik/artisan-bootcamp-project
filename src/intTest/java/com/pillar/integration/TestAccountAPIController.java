@@ -6,9 +6,8 @@ import com.pillar.account.Account;
 import com.pillar.account.AccountRepository;
 import com.pillar.cardholder.CardholderRepository;
 import com.pillar.customer.CustomerRepository;
-import com.pillar.transaction.TransactionRecord;
-import jdk.nashorn.internal.ir.CaseNode;
 import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,7 +24,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import static com.pillar.TransactionController.TransactionRequest;
-import static com.pillar.transaction.TransactionRecord.*;
+import static com.pillar.transaction.TransactionRecord.DELTA;
 import static org.junit.Assert.*;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -59,16 +58,18 @@ public class TestAccountAPIController {
     private JdbcTemplate jdbcTemplate;
 
 
+    @Before
+    public void setUp() throws Exception {
+        createAccount();
+    }
+
     @Test
     public void createsNewCardholder() {
-        createAccount();
-
         assertEquals(1, cardholderRepository.findBySsn(TEST_CARDHOLDER_SSN).size());
     }
 
     @Test
     public void doesNotDuplicateCardholder() {
-        createAccount();
         createAccount();
 
         assertEquals(1, cardholderRepository.findBySsn(TEST_CARDHOLDER_SSN).size());
@@ -76,14 +77,11 @@ public class TestAccountAPIController {
 
     @Test
     public void createsNewCustomer() {
-        createAccount();
-
         assertEquals(1, customerRepository.findByName(TEST_BUSINESS).size());
     }
 
     @Test
     public void doesNotDuplicateCustomer() {
-        createAccount();
         createAccount();
 
         assertEquals(1, customerRepository.findByName(TEST_BUSINESS).size());
@@ -91,20 +89,16 @@ public class TestAccountAPIController {
 
     @Test
     public void createsNewAccount() {
-        createAccount();
-
         assertEquals(1, accountRepository.findAll().size());
     }
 
     @Test
     public void findsAccountByCardNumber() {
-        createAccount();
         assertNotNull(accountRepository.findOneByCreditCardNumber(account.getCreditCardNumber()));
     }
 
     @Test
     public void cancelsAccountByCardNumber() {
-        createAccount();
         controller.cancelAccount(account.getCreditCardNumber());
         Optional<Account> maybeChangedAccount = accountRepository.findOneByCreditCardNumber(account.getCreditCardNumber());
         if (maybeChangedAccount.isPresent()) {
@@ -117,7 +111,6 @@ public class TestAccountAPIController {
 
     @Test
     public void getAccountReturnsOKResponseGivenValidCreditCardNumber() {
-        createAccount();
         String creditCardNumber = account.getCreditCardNumber();
 
         ResponseEntity<?> responseEntity = controller.getAccount(creditCardNumber);
@@ -136,7 +129,6 @@ public class TestAccountAPIController {
 
     @Test
     public void getAccountReturnsAccountWithTransactionBalanceEqualToChargeAmountGivenChargeTransactionOfChargeAmount() {
-        createAccount();
         double chargeAmount = 5.0;
         String creditCardNumber = account.getCreditCardNumber();
         transactionController.createDbTransaction(new TransactionRequest(creditCardNumber, chargeAmount, NOW, RETAILER ));
@@ -148,7 +140,6 @@ public class TestAccountAPIController {
 
     @Test
     public void getAccountReturnsAccountWithTransactionBalanceEqualToSumOfChargesGiven2Transactions() {
-        createAccount();
         double charge1 = 1.0;
         double charge2 = 2.0;
         String creditCardNumber = account.getCreditCardNumber();
@@ -162,7 +153,6 @@ public class TestAccountAPIController {
 
     @Test
     public void getAccountReturnsAccountWithChargeBalanceEqualToZeroWhenNoTransactionsGiven() {
-        createAccount();
         String creditCardNumber = account.getCreditCardNumber();
 
         ResponseEntity<Account> entity = controller.getAccount(creditCardNumber);
@@ -172,7 +162,6 @@ public class TestAccountAPIController {
 
     @Test
     public void getAccountReturnsAccountWithChargeBalanceEqualToAmountOfChargeTransactionGiven() {
-        createAccount();
         String creditCardNumber = account.getCreditCardNumber();
         double chargeAmount = 2.0;
         createChargeTransaction(creditCardNumber, chargeAmount);
@@ -189,8 +178,8 @@ public class TestAccountAPIController {
 
     }
 
-    private void createChargeTransaction(String creditCardNumber, double charge1) {
-        transactionController.createDbTransaction(new TransactionRequest(creditCardNumber, charge1, Instant.now(), RETAILER));
+    private void createChargeTransaction(String creditCardNumber, double amount) {
+        transactionController.createDbTransaction(new TransactionRequest(creditCardNumber, amount, Instant.now(), RETAILER));
     }
 
     @After

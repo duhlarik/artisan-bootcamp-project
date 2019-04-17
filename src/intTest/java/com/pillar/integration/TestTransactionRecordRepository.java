@@ -5,7 +5,6 @@ import com.pillar.account.Account;
 import com.pillar.transaction.TransactionRecord;
 import com.pillar.transaction.TransactionRecordRepository;
 import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -65,6 +64,18 @@ public class TestTransactionRecordRepository {
         TransactionRecord outputTxRecord = transactionRecordRepository.save(inputTxRecord);
 
         assertEquals(isCharge, outputTxRecord.isCharge());
+    }
+
+    @Test
+    public void findAllByAccountAndIsChargeTrueTransactionsByAccountReturnsOnlyChargeTransactionsCreated() {
+        createAccount();
+        transactionRecordRepository.save(new TransactionRecord(5.0, Instant.now(), true, account, true));
+        transactionRecordRepository.save(new TransactionRecord(5.0, Instant.now(), true, account, false));
+
+        ArrayList<TransactionRecord> expected = transactionRecordRepository.findAllByAccountAndIsChargeTrue(account);
+
+        int numberOfTransactionsToBeReturned = 1;
+        assertEquals(numberOfTransactionsToBeReturned, expected.size());
     }
 
     private ArrayList<TransactionRecord> list(TransactionRecord...records){

@@ -7,4 +7,6 @@ import java.util.ArrayList;
 
 public interface TransactionRecordRepository extends JpaRepository<TransactionRecord, Integer> {
     ArrayList<TransactionRecord> findAllByAccount(Account account);
+
+    ArrayList<TransactionRecord> findAllByAccountAndIsChargeTrue(Account account);
 }

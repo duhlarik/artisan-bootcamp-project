@@ -1,11 +1,9 @@
 package com.pillar.transaction;
 
-import com.pillar.TransactionController;
-
 public class Transaction {
-    Double amount;
-    Double balance;
-    Double creditLimit;
+    private Double amount;
+    private Double balance;
+    private Double creditLimit;
 
     public Transaction(Double amount, Double balance, Double creditLimit) {
         this.amount = amount;

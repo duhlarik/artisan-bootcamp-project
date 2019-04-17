@@ -12,7 +12,6 @@ import java.util.UUID;
 public class Account {
     public static final String CREDIT_CARD_NUMBER = "creditCardNumber";
     public static final String CREDIT_LIMIT = "creditLimit";
-    public static final String ACTIVE = "active";
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

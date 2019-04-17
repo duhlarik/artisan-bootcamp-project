@@ -54,7 +54,7 @@ public class TestAccountAPIController {
     private AccountRepository accountRepository;
 
     @Autowired
-    JdbcTemplate jdbcTemplate;
+    private JdbcTemplate jdbcTemplate;
 
 
     @Test
@@ -141,7 +141,7 @@ public class TestAccountAPIController {
 
         Account responseAccount = controller.getAccount(creditCardNumber).getBody();
 
-        assertEquals(chargeAmount, responseAccount.getTransactionBalance(), 0.001);
+        assertEquals(chargeAmount, responseAccount.getTransactionBalance(), TransactionRecord.DELTA);
     }
 
     @Test
@@ -155,7 +155,7 @@ public class TestAccountAPIController {
 
         ResponseEntity<Account> entity = controller.getAccount(creditCardNumber);
 
-        assertEquals(charge1+charge2, entity.getBody().getTransactionBalance(), 0.001);
+        assertEquals(charge1+charge2, entity.getBody().getTransactionBalance(), TransactionRecord.DELTA);
     }
 
     @Test

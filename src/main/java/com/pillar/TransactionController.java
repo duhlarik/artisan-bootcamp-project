@@ -51,7 +51,7 @@ public class TransactionController {
 
     private TransactionRecord saveTransaction(@RequestBody TransactionRequest request) {
         Account account = accountRepository.findByCardNumber(request.creditCardNumber);
-        TransactionRecord transactionRecord = new TransactionRecord(request.getAmount(), request.dateOfTransaction, APPROVED, account, true);
+        TransactionRecord transactionRecord = new TransactionRecord(request.getAmount(), request.dateOfTransaction, APPROVED, account, request.isCharge);
         return transactionRecordRepository.save(transactionRecord);
     }
 
@@ -85,6 +85,7 @@ public class TransactionController {
     }
 
     public static class TransactionRequest {
+        public boolean isCharge = true;
         private String creditCardNumber;
         private Double amount;
         private Instant dateOfTransaction;

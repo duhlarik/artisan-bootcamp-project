@@ -4,6 +4,7 @@ import com.pillar.AccountApiController;
 import com.pillar.TransactionController;
 import com.pillar.account.Account;
 import com.pillar.transaction.TransactionBankRequest;
+import com.pillar.transaction.TransactionRecord;
 import cucumber.api.java.en.Given;
 import cucumber.api.java.en.Then;
 import cucumber.api.java.en.When;
@@ -48,6 +49,33 @@ public class TransactionStepdefs {
         account = response.bodyToMono(Account.class).block();
     }
 
+    @Given("a charge balance of $500")
+    public void aChargeBalanceOf500(){
+        double amount = 500;
+        TransactionController.TransactionRequest transaction = new TransactionController.TransactionRequest(account.getCreditCardNumber(), amount, Instant.now(), "Electronics XYZ");
+        response = client
+                .post()
+                .uri("/transaction/createv2")
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(BodyInserters.fromObject(transaction))
+                .exchange()
+                .block();
+    }
+
+    @When("a payment transaction request is made of $100")
+    public void aPaymentTransactionRequestIsMadeOf100(){
+        double amount = 100;
+        TransactionController.TransactionRequest transaction = new TransactionController.TransactionRequest(account.getCreditCardNumber(), amount, Instant.now(), "Electronics XYZ", false);
+        response = client
+                .post()
+                .uri("/transaction/payment")
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(BodyInserters.fromObject(transaction))
+                .exchange()
+                .block();
+        assertEquals(HttpStatus.CREATED, response.statusCode());
+    }
+
     @When("a purchase transaction request is made,")
     public void aPurchaseTransactionRequestIsMade() {
         TransactionBankRequest transactionBankRequest = new TransactionBankRequest(account.getCreditCardNumber(), 2.00, new Date(), 1, account.getCreditLimit());
@@ -75,5 +103,19 @@ public class TransactionStepdefs {
     @Then("success response is returned")
     public void successResponseIsReturned() {
         assertEquals(HttpStatus.CREATED, response.statusCode());
+    }
+
+    @Then("The charge Balance is $400")
+    public void theChargeBalanceIs400(){
+        final ClientResponse response = client
+                .get()
+                .uri("/api/account/" + account.getCreditCardNumber())
+                .exchange()
+                .block();
+
+        account = response.bodyToMono(Account.class).block();
+
+        double chargeBalance = account.getChargeBalance();
+        assertEquals(400, chargeBalance, TransactionRecord.DELTA);
     }
 }

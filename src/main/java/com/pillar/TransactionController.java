@@ -22,7 +22,7 @@ import static com.pillar.Balance.calculateTransactionBalance;
 @RequestMapping("/transaction")
 public class TransactionController {
 
-    public static final boolean APPROVED = true;
+    private static final boolean APPROVED = true;
     private static final Integer FAILED_TRANSACTION_ID = 0;
     private AccountRepository accountRepository;
     private TransactionRecordRepository transactionRecordRepository;
@@ -69,8 +69,9 @@ public class TransactionController {
         return new Transaction(amount, calculateTransactionBalance(transactionRecordList), creditLimit);
     }
 
-    public ResponseEntity<TransactionResponse> createPaymentTransaction(double amount) {
-        return new ResponseEntity<>(new TransactionResponse(0, false), HttpStatus.FORBIDDEN);
+    @RequestMapping(path = "/payment", method={RequestMethod.POST})
+    public ResponseEntity<TransactionResponse> createPaymentTransaction(@RequestBody TransactionRequest request) {
+        return new ResponseEntity<>(new TransactionResponse(0, false), HttpStatus.CREATED);
     }
 
     public static class TransactionResponse {
@@ -90,17 +91,19 @@ public class TransactionController {
             return approved;
         }
 
-        public double getChargeBalance() {
-            return 0;
-        }
+//        public double getChargeBalance() {
+//            return 0;
+//        }
     }
 
     public static class TransactionRequest {
-        public boolean isCharge = true;
+        private boolean isCharge = true;
         private String creditCardNumber;
         private Double amount;
         private Instant dateOfTransaction;
         private String retailer;
+
+        public TransactionRequest() {}
 
         public TransactionRequest(String creditCardNumber, Double amount, Instant dateOfTransaction, String retailer) {
             this.creditCardNumber = creditCardNumber;
@@ -109,8 +112,16 @@ public class TransactionController {
             this.retailer = retailer;
         }
 
+        public TransactionRequest(String creditCardNumber, Double amount, Instant dateOfTransaction, String retailer, Boolean isCharge) {
+            this.creditCardNumber = creditCardNumber;
+            this.amount = amount;
+            this.dateOfTransaction = dateOfTransaction;
+            this.retailer = retailer;
+            this.isCharge = isCharge;
+        }
+
         public String getCreditCardNumber() {
-            return creditCardNumber;
+        return creditCardNumber;
         }
 
         public Double getAmount() {

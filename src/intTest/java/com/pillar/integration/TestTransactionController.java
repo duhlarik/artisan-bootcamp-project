@@ -28,6 +28,9 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import static com.pillar.TransactionController.TransactionRequest;
+import static com.pillar.TransactionController.TransactionResponse;
+import static com.pillar.transaction.TransactionRecord.DELTA;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -38,6 +41,7 @@ public class TestTransactionController {
     private static final String TEST_CARDHOLDER_NAME = "Steve Goliath";
     private static final String TEST_CARDHOLDER_SSN = "123-45-6789";
     private static final String TEST_BUSINESS = "Target";
+    private static final Instant NOW = Instant.now();
 
     private Account account;
 
@@ -50,10 +54,10 @@ public class TestTransactionController {
     private TransactionRecordRepository transactionRecordRepository;
 
     @Autowired
-    JdbcTemplate jdbcTemplate;
+    private JdbcTemplate jdbcTemplate;
 
     @Autowired
-    TransactionController transactionController;
+    private TransactionController transactionController;
 
     @Before
     public void setUp() {
@@ -81,9 +85,9 @@ public class TestTransactionController {
         Double balance = account.getCreditLimit() - amount;
         transactionRecordRepository.save(new TransactionRecord(balance, Instant.now(), true, account));
         Instant date = Instant.now();
-        TransactionController.TransactionRequest request = new TransactionController.TransactionRequest(account.getCreditCardNumber(), amount, date, "RETAILER");
+        TransactionRequest request = new TransactionRequest(account.getCreditCardNumber(), amount, date, "RETAILER");
 
-        ResponseEntity<TransactionController.TransactionResponse> response = transactionController.createDbTransaction(request);
+        ResponseEntity<TransactionResponse> response = transactionController.createDbTransaction(request);
 
         HttpStatus actual = response.getStatusCode();
         assertEquals(HttpStatus.CREATED, actual);
@@ -93,10 +97,10 @@ public class TestTransactionController {
     public void testTransactionOf100IsRecordedAgainstTheTestCustomerAccount() {
         createAccount();
         Instant dateOfTransaction = Instant.now().truncatedTo(ChronoUnit.SECONDS);
-        TransactionController.TransactionRequest request = new TransactionController.TransactionRequest(account.getCreditCardNumber(), 100.0, dateOfTransaction, "Electronics XYZ");
-        ResponseEntity<TransactionController.TransactionResponse> response = transactionController.createDbTransaction(request);
+        TransactionRequest request = new TransactionRequest(account.getCreditCardNumber(), 100.0, dateOfTransaction, "Electronics XYZ");
+        ResponseEntity<TransactionResponse> response = transactionController.createDbTransaction(request);
 
-        TransactionController.TransactionResponse responseBody = response.getBody();
+        TransactionResponse responseBody = response.getBody();
 
         TransactionRecord dbTransaction = transactionRecordRepository.findById(responseBody.getTransactionId()).get();
         assertEquals(request.getAmount(), dbTransaction.getAmount());
@@ -113,10 +117,12 @@ public class TestTransactionController {
         double chargeBalanceBefore = account.getChargeBalance();
         double amount = 0;
 
-        ResponseEntity<TransactionController.TransactionResponse> response = transactionController.createPaymentTransaction(amount);
-        double chargeBalanceAfter = response.getBody().getChargeBalance();
+        TransactionRequest request = new TransactionRequest(account.getCreditCardNumber(), amount, NOW, TEST_BUSINESS, false);
+        ResponseEntity<TransactionResponse> response = transactionController.createPaymentTransaction(request);
+        ResponseEntity<Account> accountResponseEntity = accountApiController.getAccount(account.getCreditCardNumber());
+        double chargeBalanceAfter = accountResponseEntity.getBody().getChargeBalance();
 
-        assertEquals(chargeBalanceBefore, chargeBalanceAfter, TransactionRecord.DELTA);
+        assertEquals(chargeBalanceBefore, chargeBalanceAfter, DELTA);
     }
 
     private void createAccount() {

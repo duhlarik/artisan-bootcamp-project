@@ -42,6 +42,9 @@ public class TestTransactionController {
     private static final String TEST_CARDHOLDER_SSN = "123-45-6789";
     private static final String TEST_BUSINESS = "Target";
     private static final Instant NOW = Instant.now();
+    private static final boolean APPROVED = true;
+    private static final String RETAILER = "RETAILER";
+    private static final double AMOUNT_BELOW_CREDIT_LIMIT = 10.0;
 
     private Account account;
 
@@ -61,8 +64,7 @@ public class TestTransactionController {
 
     @Before
     public void setUp() {
-        String defaultEndpoint = "http://localhost:5000";
-        client = WebClient.create(System.getProperty("fake-bank-service", defaultEndpoint));
+        client = WebClient.create(System.getProperty("fake-bank-service", "http://localhost:5000"));
         createAccount();
     }
 
@@ -81,11 +83,9 @@ public class TestTransactionController {
 
     @Test
     public void returns201CreatedIfSumOfBalanceAndAmountEqualToCreditLimit() {
-        Double amount = 10.0;
-        Double balance = account.getCreditLimit() - amount;
-        transactionRecordRepository.save(new TransactionRecord(balance, Instant.now(), true, account));
-        Instant date = Instant.now();
-        TransactionRequest request = new TransactionRequest(account.getCreditCardNumber(), amount, date, "RETAILER");
+        Double balance = account.getCreditLimit() - AMOUNT_BELOW_CREDIT_LIMIT;
+        transactionRecordRepository.save(new TransactionRecord(balance, NOW, APPROVED, account));
+        TransactionRequest request = new TransactionRequest(account.getCreditCardNumber(), AMOUNT_BELOW_CREDIT_LIMIT, NOW, RETAILER);
 
         ResponseEntity<TransactionResponse> response = transactionController.createDbTransaction(request);
 
@@ -95,10 +95,10 @@ public class TestTransactionController {
 
     @Test
     public void returns403ForbiddenIfSumOfBalanceAndAmountAreAboveTheCreditLimit() {
-        Double amount = 10.0;
+        Double amount = AMOUNT_BELOW_CREDIT_LIMIT;
         Double balance = (double) account.getCreditLimit();
-        transactionRecordRepository.save(new TransactionRecord(balance, NOW, true, account));
-        TransactionRequest request = new TransactionRequest(account.getCreditCardNumber(), amount, NOW, "RETAILER");
+        transactionRecordRepository.save(new TransactionRecord(balance, NOW, APPROVED, account));
+        TransactionRequest request = new TransactionRequest(account.getCreditCardNumber(), amount, NOW, RETAILER);
 
         ResponseEntity<TransactionResponse> response = transactionController.createDbTransaction(request);
 

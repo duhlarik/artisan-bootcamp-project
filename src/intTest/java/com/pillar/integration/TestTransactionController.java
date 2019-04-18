@@ -125,6 +125,22 @@ public class TestTransactionController {
         assertEquals(chargeBalanceBefore, chargeBalanceAfter, DELTA);
     }
 
+    @Test
+    public void givenAPaymentTransactionChargeBalanceIsReducedByPaymentAmount() {
+        createAccount();
+        double chargeBalanceBefore = account.getChargeBalance();
+        double paymentAmount = 5.0;
+        TransactionRequest request = new TransactionRequest(account.getCreditCardNumber(), paymentAmount, NOW, TEST_BUSINESS, false);
+
+        TransactionResponse txResponse = transactionController.createPaymentTransaction(request).getBody();
+
+        ResponseEntity<Account> accountResponseEntity = accountApiController.getAccount(account.getCreditCardNumber());
+        double actual = accountResponseEntity.getBody().getChargeBalance();
+        assertEquals(chargeBalanceBefore - paymentAmount, actual, DELTA);
+        assertTrue(txResponse.isApproved());
+        assertTrue(txResponse.getTransactionId() > 0);
+    }
+
     private void createAccount() {
         final Map<String, String> params = new HashMap<>();
         params.put(AccountApiController.CARDHOLDER_NAME, TEST_CARDHOLDER_NAME);

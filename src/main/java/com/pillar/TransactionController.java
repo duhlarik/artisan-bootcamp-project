@@ -71,7 +71,10 @@ public class TransactionController {
 
     @RequestMapping(path = "/payment", method={RequestMethod.POST})
     public ResponseEntity<TransactionResponse> createPaymentTransaction(@RequestBody TransactionRequest request) {
-        return new ResponseEntity<>(new TransactionResponse(0, false), HttpStatus.CREATED);
+        Account account = accountRepository.findByCardNumber(request.getCreditCardNumber());
+        TransactionRecord transaction = new TransactionRecord(-1 * request.getAmount(), request.getDateOfTransaction(), true, account, true);
+        TransactionRecord savedTransactionRecord = transactionRecordRepository.save(transaction);
+        return new ResponseEntity<>(new TransactionResponse(savedTransactionRecord.getId(), true), HttpStatus.CREATED);
     }
 
     public static class TransactionResponse {

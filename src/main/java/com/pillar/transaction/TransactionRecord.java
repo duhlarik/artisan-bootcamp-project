@@ -32,9 +32,9 @@ public class TransactionRecord {
         this.isCharge = isCharge;
     }
 
-    private void setFields(Double amount, Instant dateOfTransaction, boolean approved, Account account) {
+    private void setFields(double amount, Instant date, boolean approved, Account account) {
         this.amount = amount;
-        this.dateOfTransaction = dateOfTransaction;
+        this.dateOfTransaction = date;
         this.approved = approved;
         this.account = account;
     }

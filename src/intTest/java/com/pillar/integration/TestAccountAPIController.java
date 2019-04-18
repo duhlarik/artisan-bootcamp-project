@@ -6,6 +6,7 @@ import com.pillar.account.Account;
 import com.pillar.account.AccountRepository;
 import com.pillar.cardholder.CardholderRepository;
 import com.pillar.customer.CustomerRepository;
+import com.pillar.transaction.TransactionRecord;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -24,7 +25,6 @@ import java.util.Map;
 import java.util.Optional;
 
 import static com.pillar.TransactionController.TransactionRequest;
-import static com.pillar.transaction.TransactionRecord.DELTA;
 import static org.junit.Assert.*;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -135,7 +135,7 @@ public class TestAccountAPIController {
 
         Account responseAccount = controller.getAccount(creditCardNumber).getBody();
 
-        assertEquals(chargeAmount, responseAccount.getTransactionBalance(), DELTA);
+        assertEquals(chargeAmount, responseAccount.getTransactionBalance(), TransactionRecord.DELTA);
     }
 
     @Test
@@ -148,7 +148,7 @@ public class TestAccountAPIController {
 
         ResponseEntity<Account> entity = controller.getAccount(creditCardNumber);
 
-        assertEquals(charge1+charge2, entity.getBody().getTransactionBalance(), DELTA);
+        assertEquals(charge1+charge2, entity.getBody().getTransactionBalance(), TransactionRecord.DELTA);
     }
 
     @Test
@@ -157,7 +157,7 @@ public class TestAccountAPIController {
 
         ResponseEntity<Account> entity = controller.getAccount(creditCardNumber);
 
-        assertEquals(0, entity.getBody().getChargeBalance(), DELTA);
+        assertEquals(0, entity.getBody().getChargeBalance(), TransactionRecord.DELTA);
     }
 
     @Test
@@ -165,17 +165,10 @@ public class TestAccountAPIController {
         String creditCardNumber = account.getCreditCardNumber();
         double chargeAmount = 2.0;
         createChargeTransaction(creditCardNumber, chargeAmount);
-        createAuthorizationTransaction(creditCardNumber, 3.0);
 
         ResponseEntity<Account> entity = controller.getAccount(creditCardNumber);
 
-        assertEquals(5.0, entity.getBody().getTransactionBalance(), DELTA);
-        assertEquals(chargeAmount, entity.getBody().getChargeBalance(), DELTA);
-    }
-
-    private void createAuthorizationTransaction(String creditCardNumber, double amount) {
-        transactionController.createDbTransaction(new TransactionRequest(creditCardNumber, amount, Instant.now(), RETAILER, false));
-
+        assertEquals(chargeAmount, entity.getBody().getChargeBalance(), TransactionRecord.DELTA);
     }
 
     private void createChargeTransaction(String creditCardNumber, double amount) {

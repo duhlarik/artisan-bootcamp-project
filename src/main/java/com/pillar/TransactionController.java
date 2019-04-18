@@ -8,18 +8,21 @@ import com.pillar.transaction.TransactionRecord;
 import com.pillar.transaction.TransactionRecordRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.time.Instant;
 import java.util.ArrayList;
 
-import static com.pillar.BalanceCalculator.*;
+import static com.pillar.BalanceCalculator.transactionBalance;
 
 @RestController
 @RequestMapping("/transaction")
 public class TransactionController {
 
-    private static final boolean APPROVED = true;
+    public static final boolean APPROVED = true;
     private static final Integer FAILED_TRANSACTION_ID = 0;
     private AccountRepository accountRepository;
     private TransactionRecordRepository transactionRecordRepository;
@@ -53,7 +56,7 @@ public class TransactionController {
 
     private TransactionRecord saveTransaction(@RequestBody TransactionRequest request) {
         Account account = accountRepository.findByCardNumber(request.creditCardNumber);
-        TransactionRecord transactionRecord = new TransactionRecord(request.getAmount(), request.dateOfTransaction, APPROVED, account, request.isCharge());
+        TransactionRecord transactionRecord = new TransactionRecord(request.getAmount(), request.dateOfTransaction, APPROVED, account, request.isCharge);
         return transactionRecordRepository.save(transactionRecord);
     }
 
@@ -85,27 +88,17 @@ public class TransactionController {
     }
 
     public static class TransactionRequest {
+        public boolean isCharge = true;
         private String creditCardNumber;
         private Double amount;
         private Instant dateOfTransaction;
         private String retailer;
-        private boolean isCharge;
 
         public TransactionRequest(String creditCardNumber, Double amount, Instant dateOfTransaction, String retailer) {
-            setFields(creditCardNumber, amount, dateOfTransaction, retailer);
-            this.isCharge = true;
-        }
-
-        private void setFields(String creditCardNumber, Double amount, Instant dateOfTransaction, String retailer) {
             this.creditCardNumber = creditCardNumber;
             this.amount = amount;
             this.dateOfTransaction = dateOfTransaction;
             this.retailer = retailer;
-        }
-
-        public TransactionRequest(String creditCardNumber, double amount, Instant dateOfTransaction, String retailer, boolean isCharge) {
-            setFields(creditCardNumber, amount, dateOfTransaction, retailer);
-            this.isCharge = isCharge;
         }
 
         public String getCreditCardNumber() {
@@ -121,9 +114,6 @@ public class TransactionController {
         }
 
 
-        public boolean isCharge() {
-            return isCharge;
-        }
     }
 
 }

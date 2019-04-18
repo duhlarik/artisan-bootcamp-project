@@ -38,66 +38,51 @@ public class TransactionStepdefs {
         payload.put(AccountApiController.CARDHOLDER_SSN, "123-45-6788");
         payload.put(AccountApiController.BUSINESS_NAME, "Target");
 
-        final ClientResponse response = client
+        String endpoint = AccountApiController.ENDPOINT;
+        final ClientResponse response = postApiRequest(payload, endpoint);
+
+        account = response.bodyToMono(Account.class).block();
+    }
+
+    private ClientResponse postApiRequest(Object payload, String endpoint) {
+        return client
                 .post()
-                .uri(AccountApiController.ENDPOINT)
+                .uri(endpoint)
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(BodyInserters.fromObject(payload))
                 .exchange()
                 .block();
-
-        account = response.bodyToMono(Account.class).block();
     }
+
 
     @Given("a charge balance of $500")
     public void aChargeBalanceOf500(){
         double amount = 500;
         TransactionController.TransactionRequest transaction = new TransactionController.TransactionRequest(account.getCreditCardNumber(), amount, Instant.now(), "Electronics XYZ");
-        response = client
-                .post()
-                .uri("/transaction/createv2")
-                .contentType(MediaType.APPLICATION_JSON)
-                .body(BodyInserters.fromObject(transaction))
-                .exchange()
-                .block();
+        response = postApiRequest(transaction, "/transaction/createv2");
     }
 
     @When("a payment transaction request is made of $100")
     public void aPaymentTransactionRequestIsMadeOf100(){
         double amount = 100;
         TransactionController.TransactionRequest transaction = new TransactionController.TransactionRequest(account.getCreditCardNumber(), amount, Instant.now(), "Electronics XYZ", false);
-        response = client
-                .post()
-                .uri("/transaction/payment")
-                .contentType(MediaType.APPLICATION_JSON)
-                .body(BodyInserters.fromObject(transaction))
-                .exchange()
-                .block();
+        String endpoint = "/transaction/payment";
+        response = postApiRequest(transaction, endpoint);
         assertEquals(HttpStatus.CREATED, response.statusCode());
     }
 
     @When("a purchase transaction request is made,")
     public void aPurchaseTransactionRequestIsMade() {
         TransactionBankRequest transactionBankRequest = new TransactionBankRequest(account.getCreditCardNumber(), 2.00, new Date(), 1, account.getCreditLimit());
-        response = client
-                .post()
-                .uri("/transaction/create")
-                .contentType(MediaType.APPLICATION_JSON)
-                .body(BodyInserters.fromObject(transactionBankRequest))
-                .exchange()
-                .block();
+        String endpoint = "/transaction/create";
+        response = postApiRequest(transactionBankRequest, endpoint);
     }
 
     @When("a v2 purchase transaction request is made,")
     public void aV2PurchaseTransactionRequestIsMade() {
         TransactionController.TransactionRequest transaction = new TransactionController.TransactionRequest(account.getCreditCardNumber(), 2.00, Instant.now(), "Electronics XYZ");
-        response = client
-                .post()
-                .uri("/transaction/createv2")
-                .contentType(MediaType.APPLICATION_JSON)
-                .body(BodyInserters.fromObject(transaction))
-                .exchange()
-                .block();
+        String endpoint = "/transaction/createv2";
+        response = postApiRequest(transaction, endpoint);
     }
 
     @Then("success response is returned")

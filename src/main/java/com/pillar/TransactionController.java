@@ -43,9 +43,8 @@ public class TransactionController {
     public ResponseEntity<TransactionResponse> createDbTransaction(@RequestBody TransactionRequest request) {
         Double amount = request.getAmount();
         Account account = accountRepository.findByCardNumber(request.getCreditCardNumber());
-        double creditLimit = account.getCreditLimit();
         ArrayList<TransactionRecord> transactionRecordList = transactionRecordRepository.findAllByAccount(account);
-        TransactionRecordGenerator txRecordGenerator = new TransactionRecordGenerator(amount, transactionRecordList, creditLimit, request.getDateOfTransaction(), request.isCharge, account);
+        TransactionRecordGenerator txRecordGenerator = new TransactionRecordGenerator(amount, transactionRecordList, request.getDateOfTransaction(), request.isCharge, account);
         TransactionRecord record = txRecordGenerator.generate();
 
         if(record.isApproved()){

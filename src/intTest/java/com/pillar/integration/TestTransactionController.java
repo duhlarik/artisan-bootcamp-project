@@ -94,6 +94,19 @@ public class TestTransactionController {
     }
 
     @Test
+    public void returns403ForbiddenIfSumOfBalanceAndAmountAreAboveTheCreditLimit() {
+        Double amount = 10.0;
+        Double balance = (double) account.getCreditLimit();
+        transactionRecordRepository.save(new TransactionRecord(balance, NOW, true, account));
+        TransactionRequest request = new TransactionRequest(account.getCreditCardNumber(), amount, NOW, "RETAILER");
+
+        ResponseEntity<TransactionResponse> response = transactionController.createDbTransaction(request);
+
+        HttpStatus actual = response.getStatusCode();
+        assertEquals(HttpStatus.FORBIDDEN, actual);
+    }
+
+    @Test
     public void testTransactionOf100IsRecordedAgainstTheTestCustomerAccount() {
         Instant dateOfTransaction = Instant.now().truncatedTo(ChronoUnit.SECONDS);
         TransactionRequest request = new TransactionRequest(account.getCreditCardNumber(), 100.0, dateOfTransaction, "Electronics XYZ");

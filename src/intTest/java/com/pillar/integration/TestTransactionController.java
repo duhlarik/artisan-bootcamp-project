@@ -107,6 +107,18 @@ public class TestTransactionController {
         assertEquals(HttpStatus.CREATED, response.getStatusCode());
     }
 
+    @Test
+    public void givenAPaymentTransactionOf0ChargeBalanceRemainsTheSame() {
+        createAccount();
+        double chargeBalanceBefore = account.getChargeBalance();
+        double amount = 0;
+
+        ResponseEntity<TransactionController.TransactionResponse> response = transactionController.createPaymentTransaction(amount);
+        double chargeBalanceAfter = response.getBody().getChargeBalance();
+
+        assertEquals(chargeBalanceBefore, chargeBalanceAfter, TransactionRecord.DELTA);
+    }
+
     private void createAccount() {
         final Map<String, String> params = new HashMap<>();
         params.put(AccountApiController.CARDHOLDER_NAME, TEST_CARDHOLDER_NAME);

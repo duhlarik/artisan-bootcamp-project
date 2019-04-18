@@ -69,6 +69,10 @@ public class TransactionController {
         return new Transaction(amount, calculateTransactionBalance(transactionRecordList), creditLimit);
     }
 
+    public ResponseEntity<TransactionResponse> createPaymentTransaction(double amount) {
+        return new ResponseEntity<>(new TransactionResponse(0, false), HttpStatus.FORBIDDEN);
+    }
+
     public static class TransactionResponse {
         private Integer transactionId;
         private boolean approved;
@@ -84,6 +88,10 @@ public class TransactionController {
 
         public boolean isApproved() {
             return approved;
+        }
+
+        public double getChargeBalance() {
+            return 0;
         }
     }
 

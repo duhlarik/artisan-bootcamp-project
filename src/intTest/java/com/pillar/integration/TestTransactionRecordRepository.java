@@ -64,18 +64,6 @@ public class TestTransactionRecordRepository {
         assertEquals(isCharge, outputTxRecord.isCharge());
     }
 
-    @Test
-    public void findAllByAccountAndIsChargeTrueTransactionsByAccountReturnsOnlyChargeTransactionsCreated() {
-        createAccount();
-        transactionRecordRepository.save(new TransactionRecord(AMOUNT, NOW, APPROVED, account, true));
-        transactionRecordRepository.save(new TransactionRecord(AMOUNT, NOW, APPROVED, account, false));
-
-        ArrayList<TransactionRecord> expected = transactionRecordRepository.findAllByAccountAndIsChargeTrue(account);
-
-        int numberOfTransactionsToBeReturned = 1;
-        assertEquals(numberOfTransactionsToBeReturned, expected.size());
-    }
-
     private void createAccount() {
         final Map<String, String> params = new HashMap<>();
         params.put(AccountApiController.CARDHOLDER_NAME, TEST_CARDHOLDER_NAME);

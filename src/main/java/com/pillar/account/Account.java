@@ -35,7 +35,7 @@ public class Account {
     @Transient
     private double transactionBalance = 0;
     @Transient
-    private double chargeBalance;
+    private double chargeBalance = 0;
 
     public Account() {}
 

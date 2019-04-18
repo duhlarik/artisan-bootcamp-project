@@ -76,8 +76,8 @@ public class AccountApiController {
         if(found.isPresent()){
             Account account = found.get();
             ArrayList<TransactionRecord> transactionRecordList = this.transactionRecordRepository.findAllByAccount(account);
-            account.setTransactionBalance(BalanceCalculator.transactionBalance(transactionRecordList));
-            account.setChargeBalance(BalanceCalculator.chargeBalance(transactionRecordList));
+            account.setTransactionBalance(Balance.calculateTransactionBalance(transactionRecordList));
+            account.setChargeBalance(Balance.calculateChargeBalance(transactionRecordList));
             return new ResponseEntity<>(account, HttpStatus.OK);
         }else{
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);

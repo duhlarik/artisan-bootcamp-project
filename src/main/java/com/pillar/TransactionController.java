@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.time.Instant;
 import java.util.ArrayList;
 
-import static com.pillar.BalanceCalculator.transactionBalance;
+import static com.pillar.Balance.calculateTransactionBalance;
 
 @RestController
 @RequestMapping("/transaction")
@@ -66,7 +66,7 @@ public class TransactionController {
         double creditLimit = account.getCreditLimit();
         ArrayList<TransactionRecord> transactionRecordList = transactionRecordRepository.findAllByAccount(account);
 
-        return new Transaction(amount, transactionBalance(transactionRecordList), creditLimit);
+        return new Transaction(amount, calculateTransactionBalance(transactionRecordList), creditLimit);
     }
 
     public static class TransactionResponse {

@@ -94,9 +94,6 @@ public class TransactionController {
             return approved;
         }
 
-//        public double getChargeBalance() {
-//            return 0;
-//        }
     }
 
     public static class TransactionRequest {

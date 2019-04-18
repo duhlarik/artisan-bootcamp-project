@@ -63,6 +63,7 @@ public class TestTransactionController {
     public void setUp() {
         String defaultEndpoint = "http://localhost:5000";
         client = WebClient.create(System.getProperty("fake-bank-service", defaultEndpoint));
+        createAccount();
     }
 
     @Test
@@ -80,7 +81,6 @@ public class TestTransactionController {
 
     @Test
     public void returns201CreatedIfSumOfBalanceAndAmountEqualToCreditLimit() {
-        createAccount();
         Double amount = 10.0;
         Double balance = account.getCreditLimit() - amount;
         transactionRecordRepository.save(new TransactionRecord(balance, Instant.now(), true, account));
@@ -95,7 +95,6 @@ public class TestTransactionController {
 
     @Test
     public void testTransactionOf100IsRecordedAgainstTheTestCustomerAccount() {
-        createAccount();
         Instant dateOfTransaction = Instant.now().truncatedTo(ChronoUnit.SECONDS);
         TransactionRequest request = new TransactionRequest(account.getCreditCardNumber(), 100.0, dateOfTransaction, "Electronics XYZ");
         ResponseEntity<TransactionResponse> response = transactionController.createDbTransaction(request);
@@ -113,32 +112,34 @@ public class TestTransactionController {
 
     @Test
     public void givenAPaymentTransactionOf0ChargeBalanceRemainsTheSame() {
-        createAccount();
         double chargeBalanceBefore = account.getChargeBalance();
         double amount = 0;
-
         TransactionRequest request = new TransactionRequest(account.getCreditCardNumber(), amount, NOW, TEST_BUSINESS, false);
-        ResponseEntity<TransactionResponse> response = transactionController.createPaymentTransaction(request);
+
+        transactionController.createPaymentTransaction(request);
+
         ResponseEntity<Account> accountResponseEntity = accountApiController.getAccount(account.getCreditCardNumber());
         double chargeBalanceAfter = accountResponseEntity.getBody().getChargeBalance();
-
         assertEquals(chargeBalanceBefore, chargeBalanceAfter, DELTA);
     }
 
     @Test
     public void givenAPaymentTransactionChargeBalanceIsReducedByPaymentAmount() {
-        createAccount();
         double chargeBalanceBefore = account.getChargeBalance();
         double paymentAmount = 5.0;
         TransactionRequest request = new TransactionRequest(account.getCreditCardNumber(), paymentAmount, NOW, TEST_BUSINESS, false);
 
         TransactionResponse txResponse = transactionController.createPaymentTransaction(request).getBody();
 
+        TransactionRecord dbTransaction = transactionRecordRepository.findById(txResponse.getTransactionId()).get();
         ResponseEntity<Account> accountResponseEntity = accountApiController.getAccount(account.getCreditCardNumber());
         double actual = accountResponseEntity.getBody().getChargeBalance();
         assertEquals(chargeBalanceBefore - paymentAmount, actual, DELTA);
         assertTrue(txResponse.isApproved());
         assertTrue(txResponse.getTransactionId() > 0);
+        assertEquals(paymentAmount, dbTransaction.getAmount() * -1, DELTA);
+        assertEquals(NOW.truncatedTo(ChronoUnit.SECONDS), dbTransaction.getDateOfTransaction());
+        assertEquals(account, dbTransaction.getAccount());
     }
 
     private void createAccount() {

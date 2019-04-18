@@ -2,7 +2,6 @@ package com.pillar;
 
 import com.pillar.account.Account;
 import com.pillar.account.AccountRepository;
-import com.pillar.transaction.Transaction;
 import com.pillar.transaction.TransactionBankRequest;
 import com.pillar.transaction.TransactionRecord;
 import com.pillar.transaction.TransactionRecordRepository;
@@ -15,8 +14,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.time.Instant;
 import java.util.ArrayList;
-
-import static com.pillar.Balance.calculateTransactionBalance;
 
 @RestController
 @RequestMapping("/transaction")
@@ -44,29 +41,21 @@ public class TransactionController {
 
     @RequestMapping(path = "/createv2", method = {RequestMethod.POST})
     public ResponseEntity<TransactionResponse> createDbTransaction(@RequestBody TransactionRequest request) {
-        if(createTransaction(request).isValid()){
-            TransactionRecord transactionRecord = saveTransaction(request);
+        Double amount = request.getAmount();
+        Account account = accountRepository.findByCardNumber(request.getCreditCardNumber());
+        double creditLimit = account.getCreditLimit();
+        ArrayList<TransactionRecord> transactionRecordList = transactionRecordRepository.findAllByAccount(account);
+        TransactionRecordGenerator txRecordGenerator = new TransactionRecordGenerator(amount, transactionRecordList, creditLimit, request.getDateOfTransaction(), request.isCharge, account);
+        TransactionRecord record = txRecordGenerator.generate();
+
+        if(record.isApproved()){
+            TransactionRecord transactionRecord = transactionRecordRepository.save(record);
             return new ResponseEntity<>(new TransactionResponse(transactionRecord.getId(), transactionRecord.isApproved()),
                     HttpStatus.CREATED);
         }else{
             return new ResponseEntity<>(new TransactionResponse(FAILED_TRANSACTION_ID, APPROVED),
                     HttpStatus.FORBIDDEN);
         }
-    }
-
-    private TransactionRecord saveTransaction(@RequestBody TransactionRequest request) {
-        Account account = accountRepository.findByCardNumber(request.creditCardNumber);
-        TransactionRecord transactionRecord = new TransactionRecord(request.getAmount(), request.dateOfTransaction, APPROVED, account, request.isCharge);
-        return transactionRecordRepository.save(transactionRecord);
-    }
-
-    private Transaction createTransaction(TransactionRequest request){
-        Double amount = request.getAmount();
-        Account account = accountRepository.findByCardNumber(request.getCreditCardNumber());
-        double creditLimit = account.getCreditLimit();
-        ArrayList<TransactionRecord> transactionRecordList = transactionRecordRepository.findAllByAccount(account);
-
-        return new Transaction(amount, calculateTransactionBalance(transactionRecordList), creditLimit);
     }
 
     @RequestMapping(path = "/payment", method={RequestMethod.POST})

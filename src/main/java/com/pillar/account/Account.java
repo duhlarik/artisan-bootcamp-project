@@ -108,4 +108,8 @@ public class Account {
     public void setChargeBalance(double amount) {
         chargeBalance = amount;
     }
+
+    public Integer getId() {
+        return id;
+    }
 }

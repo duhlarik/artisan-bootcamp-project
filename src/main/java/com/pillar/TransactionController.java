@@ -41,15 +41,13 @@ public class TransactionController {
 
     @RequestMapping(path = "/createv2", method = {RequestMethod.POST})
     public ResponseEntity<TransactionResponse> createDbTransaction(@RequestBody TransactionRequest request) {
-        Double amount = request.getAmount();
         Account account = accountRepository.findByCardNumber(request.getCreditCardNumber());
         ArrayList<TransactionRecord> transactionRecordList = transactionRecordRepository.findAllByAccount(account);
-        TransactionRecordGenerator txRecordGenerator = new TransactionRecordGenerator(amount, transactionRecordList, request.getDateOfTransaction(), request.isCharge, account);
-        TransactionRecord record = txRecordGenerator.generate();
+        TransactionRecord record = new TransactionRecordGenerator(request.getAmount(), transactionRecordList, request.getDateOfTransaction(), request.isCharge, account).generate();
 
         if(record.isApproved()){
-            TransactionRecord transactionRecord = transactionRecordRepository.save(record);
-            return new ResponseEntity<>(new TransactionResponse(transactionRecord.getId(), transactionRecord.isApproved()),
+            TransactionRecord txRecord = transactionRecordRepository.save(record);
+            return new ResponseEntity<>(new TransactionResponse(txRecord.getId(), txRecord.isApproved()),
                     HttpStatus.CREATED);
         }else{
             return new ResponseEntity<>(new TransactionResponse(FAILED_TRANSACTION_ID, APPROVED),

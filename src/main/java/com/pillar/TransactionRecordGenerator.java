@@ -1,7 +1,6 @@
 package com.pillar;
 
 import com.pillar.account.Account;
-import com.pillar.transaction.Transaction;
 import com.pillar.transaction.TransactionRecord;
 
 import java.time.Instant;
@@ -36,7 +35,10 @@ public class TransactionRecordGenerator {
     }
 
     public TransactionRecord generate() {
-        boolean approved = new Transaction(this.amount, calculateTransactionBalance(this.transactions), (double)account.getCreditLimit()).isValid();
-        return new TransactionRecord(this.amount, dateOfTransaction, approved, this.account, isCharge);
+        return new TransactionRecord(this.amount, dateOfTransaction, isTransactionValid(), this.account, isCharge);
+    }
+
+    public boolean isTransactionValid() {
+        return amount + calculateTransactionBalance(this.transactions) <= account.getCreditLimit();
     }
 }

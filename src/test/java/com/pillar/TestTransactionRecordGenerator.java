@@ -9,8 +9,7 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
 
-import static com.pillar.TestTransactionController.APPROVED;
-import static com.pillar.transaction.TransactionRecord.*;
+import static com.pillar.transaction.TransactionRecord.DELTA;
 import static junit.framework.TestCase.assertTrue;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -154,5 +153,25 @@ public class TestTransactionRecordGenerator {
         double expected = TransactionRecordGenerator.calculateChargeBalance(list(chargeTransaction, authTransaction));
 
         assertEquals(chargeAmount, expected, 0.001);
+    }
+
+    @Test
+    public void isValidReturnsTrueGivenBalance5_Amount5_CreditLimit_10() {
+        Account account = new Account(ID, 10, CC_NUMBER, ACTIVE, CARDHOLDER);
+        TransactionRecordGenerator transactionRecordGenerator = new TransactionRecordGenerator(5, list(new TransactionRecord(5.0, NOW, APPROVED, account)), NOW, IS_CHARGE, account);
+
+        boolean isValid = transactionRecordGenerator.isTransactionValid();
+
+        assertTrue(isValid);
+    }
+
+    @Test
+    public void isValidReturnsFalseGivenAmount6_Balance5_CreditLimit_10() {
+        Account account = new Account(ID, 10, CC_NUMBER, ACTIVE, CARDHOLDER);
+        TransactionRecordGenerator transactionRecordGenerator = new TransactionRecordGenerator(6, list(new TransactionRecord(5.0, NOW, APPROVED, account)), NOW, IS_CHARGE, account);
+
+        boolean isValid = transactionRecordGenerator.isTransactionValid();
+
+        assertFalse(isValid);
     }
 }

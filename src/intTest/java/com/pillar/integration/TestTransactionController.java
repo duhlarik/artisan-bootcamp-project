@@ -45,6 +45,7 @@ public class TestTransactionController {
     private static final boolean APPROVED = true;
     private static final String RETAILER = "RETAILER";
     private static final double AMOUNT_BELOW_CREDIT_LIMIT = 10.0;
+    private static final Boolean IS_CHARGE = false;
 
     private Account account;
 
@@ -153,6 +154,17 @@ public class TestTransactionController {
         assertEquals(paymentAmount, dbTransaction.getAmount() * -1, DELTA);
         assertEquals(NOW.truncatedTo(ChronoUnit.SECONDS), dbTransaction.getDateOfTransaction());
         assertEquals(account, dbTransaction.getAccount());
+    }
+
+    @Test
+    public void txDatesEndingInMoreThan500MillisecondsShouldBeRetrievedFromTxRepositoryInTruncatedForm() {
+        Instant instant = Instant.parse("2019-04-19T01:31:40.598Z");
+        TransactionRequest request = new TransactionRequest(account.getCreditCardNumber(), AMOUNT_BELOW_CREDIT_LIMIT, instant, TEST_BUSINESS, IS_CHARGE);
+
+        TransactionResponse txResponse = transactionController.createPaymentTransaction(request).getBody();
+        TransactionRecord dbTransaction = transactionRecordRepository.findById(txResponse.getTransactionId()).get();
+
+        assertEquals(instant.truncatedTo(ChronoUnit.SECONDS), dbTransaction.getDateOfTransaction());
     }
 
     private void createAccount() {

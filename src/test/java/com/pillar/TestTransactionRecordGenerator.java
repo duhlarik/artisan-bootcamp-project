@@ -9,6 +9,7 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
 
+import static com.pillar.TestTransactionController.APPROVED;
 import static com.pillar.transaction.TransactionRecord.*;
 import static junit.framework.TestCase.assertTrue;
 import static org.junit.Assert.assertEquals;
@@ -24,8 +25,9 @@ public class TestTransactionRecordGenerator {
     private static final boolean ACTIVE = true;
     private static final String CC_NUMBER = "123";
     private static final int ID = 1;
-    public static final Cardholder CARDHOLDER = new Cardholder();
+    private static final Cardholder CARDHOLDER = new Cardholder();
     private static final Account ACCOUNT = new Account();
+    private static final boolean APPROVED = true;
 
     @Test
     public void givenTransactionOf100AndNoExistingTransactionsAndCreditLimitOf1000ReturnTransactionRecordWithAmount100() {
@@ -105,8 +107,52 @@ public class TestTransactionRecordGenerator {
     }
 
     private ArrayList<TransactionRecord> list(TransactionRecord...records){
-        ArrayList<TransactionRecord> returnValue = EMPTY_LIST;
+        ArrayList<TransactionRecord> returnValue = new ArrayList<>();
         Collections.addAll(returnValue, records);
         return returnValue;
+    }
+
+    @Test
+    public void calculateTransactionBalanceReturns5GivenASingleTransactionRecordOf5() {
+        TransactionRecord tran = new TransactionRecord(5.0, NOW, APPROVED, ACCOUNT);
+
+        double expected = TransactionRecordGenerator.calculateTransactionBalance(list(tran));
+
+        assertEquals(5, expected, 0.001);
+    }
+
+    @Test
+    public void calculateTransactionBalanceReturns0GivenNoTransactionRecords() {
+
+        assertEquals(0, TransactionRecordGenerator.calculateTransactionBalance(list()), 0.001);
+    }
+
+    @Test
+    public void calculateTransactionBalanceReturns5GivenASingleAuthorizationTransactionRecordOf5() {
+        TransactionRecord authTransaction = new TransactionRecord(5.0, NOW, APPROVED, ACCOUNT, false);
+
+        double expected = TransactionRecordGenerator.calculateTransactionBalance(list(authTransaction));
+
+        assertEquals(5.0, expected, 0.001);
+    }
+
+    @Test
+    public void calculateChargeBalanceReturns0GivenSingleAuthorizationTransactionOf5() {
+        TransactionRecord authTransaction = new TransactionRecord(5.0, NOW, APPROVED, ACCOUNT, false);
+
+        double expected = TransactionRecordGenerator.calculateChargeBalance(list(authTransaction));
+
+        assertEquals(0, expected, 0.001);
+    }
+
+    @Test
+    public void calculateChargeBalanceReturnsChargeAmountGivenChargeAndAuthorizationTransactionRecords() {
+        double chargeAmount = 5.0;
+        TransactionRecord chargeTransaction = new TransactionRecord(chargeAmount, NOW, APPROVED, ACCOUNT, true);
+        TransactionRecord authTransaction = new TransactionRecord(1.0, NOW, APPROVED, ACCOUNT, false);
+
+        double expected = TransactionRecordGenerator.calculateChargeBalance(list(chargeTransaction, authTransaction));
+
+        assertEquals(chargeAmount, expected, 0.001);
     }
 }

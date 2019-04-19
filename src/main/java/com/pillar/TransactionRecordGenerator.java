@@ -22,8 +22,21 @@ public class TransactionRecordGenerator {
         this.account = account;
     }
 
+    public static double calculateTransactionBalance(ArrayList<TransactionRecord> list) {
+        return list.stream().
+                mapToDouble(TransactionRecord::getAmount).
+                sum();
+    }
+
+    public static double calculateChargeBalance(ArrayList<TransactionRecord> list) {
+        return list.stream()
+                .filter(TransactionRecord::isCharge)
+                .mapToDouble(TransactionRecord::getAmount)
+                .sum();
+    }
+
     public TransactionRecord generate() {
-        boolean approved = new Transaction(this.amount, Balance.calculateTransactionBalance(this.transactions), (double)account.getCreditLimit()).isValid();
+        boolean approved = new Transaction(this.amount, calculateTransactionBalance(this.transactions), (double)account.getCreditLimit()).isValid();
         return new TransactionRecord(this.amount, dateOfTransaction, approved, this.account, isCharge);
     }
 }

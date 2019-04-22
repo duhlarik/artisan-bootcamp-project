@@ -6,4 +6,6 @@ import java.util.Optional;
 
 public interface RewardsProgrammeRepository extends JpaRepository<RewardsProgramme, Integer> {
     Optional<RewardsProgramme> findOneByRetailer(String retailer);
+
+    boolean existsByRetailer(String retailer);
 }

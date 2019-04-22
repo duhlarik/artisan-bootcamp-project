@@ -6,6 +6,7 @@ import com.pillar.cardholder.Cardholder;
 import com.pillar.cardholder.CardholderRepository;
 import com.pillar.customer.Customer;
 import com.pillar.customer.CustomerRepository;
+import com.pillar.rewardsProgramme.RewardsProgrammeRepository;
 import com.pillar.transaction.TransactionRecord;
 import com.pillar.transaction.TransactionRecordRepository;
 import org.springframework.http.HttpStatus;
@@ -29,12 +30,14 @@ public class AccountApiController {
     private final CardholderRepository cardholderRepository;
     private final CustomerRepository customerRepository;
     private final TransactionRecordRepository transactionRecordRepository;
+    private final RewardsProgrammeRepository rewardsProgrammeRepository;
 
-    public AccountApiController(AccountRepository accountRepository, CardholderRepository cardholderRepository, CustomerRepository customerRepository, TransactionRecordRepository transactionRepository) {
+    public AccountApiController(AccountRepository accountRepository, CardholderRepository cardholderRepository, CustomerRepository customerRepository, TransactionRecordRepository transactionRepository, RewardsProgrammeRepository rewardsProgrammeRepository) {
         this.accountRepository = accountRepository;
         this.cardholderRepository = cardholderRepository;
         this.customerRepository = customerRepository;
-        transactionRecordRepository = transactionRepository;
+        this.transactionRecordRepository = transactionRepository;
+        this.rewardsProgrammeRepository = rewardsProgrammeRepository;
     }
 
     @RequestMapping(method = {RequestMethod.POST})
@@ -86,7 +89,7 @@ public class AccountApiController {
 
     @GetMapping(path = "/{cardNumber}/rewards/{retailer}")
     public ResponseEntity<Double> getRewardsBalance(String cardNumber, String retailer) {
-        if(retailer != "NONEXISTENT_RETAILER"){
+        if(rewardsProgrammeRepository.existsByRetailer(retailer)){
             return new ResponseEntity<>(1.0, HttpStatus.OK);
         }else{
             return new ResponseEntity<>(Double.MIN_VALUE, HttpStatus.NOT_FOUND);

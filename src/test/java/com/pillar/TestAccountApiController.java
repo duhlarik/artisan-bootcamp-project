@@ -6,6 +6,7 @@ import com.pillar.cardholder.Cardholder;
 import com.pillar.cardholder.CardholderRepository;
 import com.pillar.customer.Customer;
 import com.pillar.customer.CustomerRepository;
+import com.pillar.rewardsProgramme.RewardsProgrammeRepository;
 import com.pillar.transaction.TransactionRecordRepository;
 import org.junit.Before;
 import org.junit.Test;
@@ -23,7 +24,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 public class TestAccountApiController {
-    public static final double DELTA = 0.001;
+    private static final double DELTA = 0.001;
     private final Cardholder cardholder = new Cardholder(1, "123-45-6789", "Steve Goliath");
     private final Customer customer = new Customer(1, "Target");
 
@@ -46,7 +47,8 @@ public class TestAccountApiController {
 
         final TransactionRecordRepository transactionRepository = mock(TransactionRecordRepository.class);
 
-        controller = new AccountApiController(repository, cardholderRepository, customerRepository, transactionRepository);
+        final RewardsProgrammeRepository rewardsProgrammeRepository = mock(RewardsProgrammeRepository.class);
+        controller = new AccountApiController(repository, cardholderRepository, customerRepository, transactionRepository, rewardsProgrammeRepository);
         createAccount();
     }
 

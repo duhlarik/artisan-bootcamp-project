@@ -177,8 +177,9 @@ public class TestAccountAPIController {
     }
 
     @Test
-    public void getRewardsBalanceReturns1GivenTxBalanceOf100_AndRewardPercentageOf1Percent() {
+    public void getRewardsBalanceReturns1GivenChargeBalanceOf100AtRetailer_AndRewardPercentageOf1Percent() {
         rewardsProgrammeRepository.save(new RewardsProgramme(RETAILER, 1));
+        createChargeTransaction(account.getCreditCardNumber(), 100);
 
         ResponseEntity<Double> entity = controller.getRewardsBalance(account.getCreditCardNumber(), RETAILER);
 

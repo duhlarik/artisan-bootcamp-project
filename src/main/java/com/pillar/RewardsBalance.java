@@ -1,10 +1,15 @@
 package com.pillar;
 
-public class RewardsBalance {
-    public RewardsBalance(double chargeBalance, double percentage) {
+class RewardsBalance {
+    double chargeBalance;
+    double percentage;
+
+    RewardsBalance(double chargeBalance, double percentage) {
+        this.chargeBalance = chargeBalance;
+        this.percentage = percentage;
     }
 
-    public double calculate() {
-        return 1;
+    double calculate() {
+        return chargeBalance * percentage / 100;
     }
 }

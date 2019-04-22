@@ -11,8 +11,16 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/rewards")
 public class RewardsController {
 
+    private RewardsProgrammeRepository rewardsProgrammeRepository;
+
+    public RewardsController(RewardsProgrammeRepository rewardsProgrammeRepository) {
+        this.rewardsProgrammeRepository = rewardsProgrammeRepository;
+    }
+
     @RequestMapping("/{retailer}")
     public ResponseEntity<RewardsProgramme> createRewardsProgramme(@PathVariable String retailer, @RequestBody double percentage) {
-        return new ResponseEntity<>(new RewardsProgramme(), HttpStatus.CREATED);
+        RewardsProgramme rewardsProgramme = new RewardsProgramme(retailer, percentage);
+        rewardsProgrammeRepository.save(rewardsProgramme);
+        return new ResponseEntity<>(rewardsProgramme, HttpStatus.CREATED);
     }
 }

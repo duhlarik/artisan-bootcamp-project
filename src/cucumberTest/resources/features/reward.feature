@@ -1,8 +1,8 @@
 Feature:  As a credit card processor I want to know how many points are owed an account on which was made transactions at a retailer
 
   Scenario: Create rewards programmes
-  Given a retailer offering a reward programme
-  Then the reward programme is created
+    Given a retailer offering a reward programme
+    Then the reward programme is created
 
   Scenario: Receive rewards for qualifying transactions
     Given an account with a charge balance of 10 at TARGET

@@ -89,8 +89,9 @@ public class AccountApiController {
 
     @GetMapping(path = "/{cardNumber}/rewards/{retailer}")
     public ResponseEntity<Double> getRewardsBalance(String cardNumber, String retailer) {
-        if(rewardsProgrammeRepository.existsByRetailer(retailer)){
-            Account account = accountRepository.findOneByCreditCardNumber(cardNumber).get();
+        final Optional<Account> found = accountRepository.findOneByCreditCardNumber(cardNumber);
+        if(found.isPresent() && rewardsProgrammeRepository.existsByRetailer(retailer)){
+            Account account = found.get();
             ArrayList<TransactionRecord> transactionRecordList = this.transactionRecordRepository.findAllByAccount(account);
             double chargeBalance = TransactionRecordGenerator.calculateChargeBalance(transactionRecordList);
             double percentage = rewardsProgrammeRepository.findOneByRetailer(retailer).get().getPercentage();

@@ -1,0 +1,1 @@
+ALTER TABLE rewards_programme ADD COLUMN percentage DOUBLE NOT NULL;

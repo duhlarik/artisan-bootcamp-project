@@ -203,5 +203,6 @@ public class TestAccountAPIController {
         jdbcTemplate.execute("DELETE FROM account");
         jdbcTemplate.execute("DELETE FROM cardholder");
         jdbcTemplate.execute("DELETE FROM customer");
+        jdbcTemplate.execute("DELETE FROM rewards_programme");
     }
 }

@@ -1,8 +1,8 @@
 package com.pillar.integration;
 
 import com.pillar.AccountApiController;
-import com.pillar.RewardsProgramme;
-import com.pillar.RewardsProgrammeRepository;
+import com.pillar.rewardsProgramme.RewardsProgramme;
+import com.pillar.rewardsProgramme.RewardsProgrammeRepository;
 import com.pillar.TransactionController;
 import com.pillar.account.Account;
 import com.pillar.account.AccountRepository;

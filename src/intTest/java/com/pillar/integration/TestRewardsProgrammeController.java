@@ -1,8 +1,8 @@
 package com.pillar.integration;
 
-import com.pillar.RewardsController;
-import com.pillar.RewardsProgramme;
-import com.pillar.RewardsProgrammeRepository;
+import com.pillar.RewardsProgrammeController;
+import com.pillar.rewardsProgramme.RewardsProgramme;
+import com.pillar.rewardsProgramme.RewardsProgrammeRepository;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.junit.After;
 import org.junit.Test;
@@ -22,12 +22,12 @@ import static org.junit.Assert.assertEquals;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @Rollback
 @RunWith(SpringRunner.class)
-public class TestRewardsController {
+public class TestRewardsProgrammeController {
     private static final String RETAILER = "TARGET";
     private static final double PERCENTAGE = 1.0;
 
     @Autowired
-    private RewardsController rewardsController;
+    private RewardsProgrammeController rewardsProgrammeController;
 
     @Autowired
     private RewardsProgrammeRepository rewardsProgrammeRepository;
@@ -37,14 +37,14 @@ public class TestRewardsController {
 
     @Test
     public void createRewardProgrammeReturns201CreatedGivenARetailerAndAPercentage() {
-        ResponseEntity<RewardsProgramme> response = rewardsController.createRewardsProgramme("TARGET", 1.0);
+        ResponseEntity<RewardsProgramme> response = rewardsProgrammeController.createRewardsProgramme("TARGET", 1.0);
 
         assertEquals(HttpStatus.CREATED, response.getStatusCode());
     }
 
     @Test
     public void createRewardsProgrammeReturnsCreatedRewardsProgrammeGivenRetailerAndAPercentage() {
-        rewardsController.createRewardsProgramme(RETAILER, PERCENTAGE);
+        rewardsProgrammeController.createRewardsProgramme(RETAILER, PERCENTAGE);
 
         Optional<RewardsProgramme> actual = rewardsProgrammeRepository.findOneByRetailer(RETAILER);
         assertEquals(PERCENTAGE, actual.get().getPercentage(), 0.001);

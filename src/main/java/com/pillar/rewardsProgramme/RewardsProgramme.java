@@ -1,4 +1,4 @@
-package com.pillar;
+package com.pillar.rewardsProgramme;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -14,6 +14,8 @@ public class RewardsProgramme {
 
     private String retailer;
     private double percentage;
+
+    public RewardsProgramme(){}
 
     public RewardsProgramme(String retailer, double percentage) {
         this.retailer = retailer;

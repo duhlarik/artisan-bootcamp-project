@@ -1,7 +1,7 @@
 package com.pillar.integration;
 
-import com.pillar.RewardsProgramme;
-import com.pillar.RewardsProgrammeRepository;
+import com.pillar.rewardsProgramme.RewardsProgramme;
+import com.pillar.rewardsProgramme.RewardsProgrammeRepository;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;

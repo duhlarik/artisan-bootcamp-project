@@ -15,4 +15,4 @@ Feature:  As a credit card processor I want to know how many points are owed an 
     Given an account with a charge balance of 10 at TARGET
       And the retailer BESTBUY offering 1% rewards
     When someone requests the TARGET rewards balance
-    Then they see a balance of 0
+    Then they see a balance of 0.0

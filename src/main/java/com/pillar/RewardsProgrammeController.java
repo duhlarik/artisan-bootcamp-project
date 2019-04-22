@@ -1,5 +1,7 @@
 package com.pillar;
 
+import com.pillar.rewardsProgramme.RewardsProgramme;
+import com.pillar.rewardsProgramme.RewardsProgrammeRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -9,11 +11,11 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/rewards")
-public class RewardsController {
+public class RewardsProgrammeController {
 
     private RewardsProgrammeRepository rewardsProgrammeRepository;
 
-    public RewardsController(RewardsProgrammeRepository rewardsProgrammeRepository) {
+    public RewardsProgrammeController(RewardsProgrammeRepository rewardsProgrammeRepository) {
         this.rewardsProgrammeRepository = rewardsProgrammeRepository;
     }
 

@@ -1,4 +1,4 @@
-package com.pillar;
+package com.pillar.rewardsProgramme;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 

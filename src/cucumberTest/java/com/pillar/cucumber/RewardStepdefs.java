@@ -64,7 +64,6 @@ public class RewardStepdefs {
                 .block();
 
         assertEquals(HttpStatus.OK, response.statusCode());
-
         rewardsBalance = response.bodyToMono(Double.class).block();
     }
 

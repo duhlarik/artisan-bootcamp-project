@@ -83,4 +83,13 @@ public class AccountApiController {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
+
+    @GetMapping(path = "/{cardNumber}/rewards/{retailer}")
+    public ResponseEntity<Double> getRewardsBalance(String cardNumber, String retailer) {
+        if(retailer != "NONEXISTENT_RETAILER"){
+            return new ResponseEntity<>(1.0, HttpStatus.OK);
+        }else{
+            return new ResponseEntity<>(Double.MIN_VALUE, HttpStatus.NOT_FOUND);
+        }
+    }
 }

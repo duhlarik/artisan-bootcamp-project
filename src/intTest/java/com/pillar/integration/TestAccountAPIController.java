@@ -1,6 +1,8 @@
 package com.pillar.integration;
 
 import com.pillar.AccountApiController;
+import com.pillar.RewardsProgramme;
+import com.pillar.RewardsProgrammeRepository;
 import com.pillar.TransactionController;
 import com.pillar.account.Account;
 import com.pillar.account.AccountRepository;
@@ -56,6 +58,9 @@ public class TestAccountAPIController {
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
+
+    @Autowired
+    private RewardsProgrammeRepository rewardsProgrammeRepository;
 
 
     @Before
@@ -169,6 +174,23 @@ public class TestAccountAPIController {
         ResponseEntity<Account> entity = controller.getAccount(creditCardNumber);
 
         assertEquals(chargeAmount, entity.getBody().getChargeBalance(), TransactionRecord.DELTA);
+    }
+
+    @Test
+    public void getRewardsBalanceReturns1GivenTxBalanceOf100_AndRewardPercentageOf1Percent() {
+        rewardsProgrammeRepository.save(new RewardsProgramme(RETAILER, 1));
+
+        ResponseEntity<Double> entity = controller.getRewardsBalance(account.getCreditCardNumber(), RETAILER);
+
+        assertEquals(HttpStatus.OK, entity.getStatusCode());
+        assertEquals(1, entity.getBody(), 0.001);
+    }
+
+    @Test
+    public void getRewardsBalanceReturns404NotFoundGivenRetailerWithoutRewardsProgramme() {
+        ResponseEntity<Double> entity = controller.getRewardsBalance(account.getCreditCardNumber(), "NONEXISTENT_RETAILER");
+
+        assertEquals(HttpStatus.NOT_FOUND, entity.getStatusCode());
     }
 
     private void createChargeTransaction(String creditCardNumber, double amount) {

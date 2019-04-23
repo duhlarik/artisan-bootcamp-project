@@ -20,7 +20,7 @@ public class TransactionController {
 
     private BankService bankService;
 
-    public TransactionController(AccountRepository repository, TransactionRecordRepository transactionRecordRepository, BankService bankService){
+    public TransactionController(AccountRepository repository, TransactionRecordRepository transactionRecordRepository, BankService bankService) {
         this.accountRepository = repository;
         this.transactionRecordRepository = transactionRecordRepository;
         this.bankService = bankService;
@@ -37,8 +37,13 @@ public class TransactionController {
     public ResponseEntity<TransactionResponse> createDbTransaction(@RequestBody TransactionRequest request) {
         Account account = accountRepository.findByCardNumber(request.getCreditCardNumber());
         TransactionRecord transaction = new TransactionRecord(request.getAmount(), request.dateOfTransaction, true, account);
-        transaction = transactionRecordRepository.save(transaction);
-        return new ResponseEntity<>(new TransactionResponse(transaction.getId(), transaction.isApproved()), HttpStatus.CREATED);
+
+        if (transaction.isValid(account, transactionRecordRepository.findAllByAccount(account))) {
+            transaction = transactionRecordRepository.save(transaction);
+            return new ResponseEntity<>(new TransactionResponse(transaction.getId(), transaction.isApproved()), HttpStatus.CREATED);
+        } else {
+            return new ResponseEntity<>(new TransactionResponse(transaction.getId(), transaction.isApproved()), HttpStatus.FORBIDDEN);
+        }
     }
 
     public static class TransactionResponse {

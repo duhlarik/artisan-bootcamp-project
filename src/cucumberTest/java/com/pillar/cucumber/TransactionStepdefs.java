@@ -63,17 +63,33 @@ public class TransactionStepdefs {
     @When("a v2 purchase transaction request is made,")
     public void aV2PurchaseTransactionRequestIsMade() {
         TransactionController.TransactionRequest transaction = new TransactionController.TransactionRequest(account.getCreditCardNumber(), 2.00, Instant.now(), "Electronics XYZ");
-        response = client
+        response = createDBTransaction(transaction);
+    }
+
+    @When("two v2 transaction requests are made that each equal the credit limit")
+    public void twoVTransactionRequestsAreMadeThatEachEqualTheCreditLimit() {
+        TransactionController.TransactionRequest transaction = new TransactionController.TransactionRequest(account.getCreditCardNumber(), new Double(account.getCreditLimit()), Instant.now(), "Electronics XYZ");
+        response = createDBTransaction(transaction);
+        response = createDBTransaction(transaction);
+    }
+
+    @Then("forbidden response is returned")
+    public void forbiddenResponseIsReturned() {
+        assertEquals(HttpStatus.FORBIDDEN, response.statusCode());
+    }
+
+    @Then("success response is returned")
+    public void successResponseIsReturned() {
+        assertEquals(HttpStatus.CREATED, response.statusCode());
+    }
+
+    private ClientResponse createDBTransaction(TransactionController.TransactionRequest transaction) {
+        return client
                 .post()
                 .uri("/transaction/createv2")
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(BodyInserters.fromObject(transaction))
                 .exchange()
                 .block();
-    }
-
-    @Then("success response is returned")
-    public void successResponseIsReturned() {
-        assertEquals(HttpStatus.CREATED, response.statusCode());
     }
 }

@@ -4,6 +4,7 @@ import com.pillar.account.Account;
 
 import javax.persistence.*;
 import java.time.Instant;
+import java.util.List;
 
 @Entity
 public class TransactionRecord {
@@ -46,5 +47,10 @@ public class TransactionRecord {
 
     public boolean isApproved() {
         return approved;
+    }
+
+    public boolean isValid(Account account, List<TransactionRecord> transactionRecordList) {
+        double balance = transactionRecordList.stream().mapToDouble(TransactionRecord::getAmount).sum();
+        return amount + balance <= account.getCreditLimit();
     }
 }

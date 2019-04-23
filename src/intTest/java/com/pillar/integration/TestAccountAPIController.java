@@ -205,7 +205,7 @@ public class TestAccountAPIController {
     }
 
     private void createChargeTransaction(String creditCardNumber, double amount, String retailer) {
-        transactionController.createDbTransaction(new TransactionRequest(creditCardNumber, amount, Instant.now(), RETAILER));
+        transactionController.createDbTransaction(new TransactionRequest(creditCardNumber, amount, Instant.now(), retailer));
     }
 
     @After

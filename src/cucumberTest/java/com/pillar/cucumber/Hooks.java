@@ -17,5 +17,6 @@ public class Hooks {
         template.execute("DELETE FROM account");
         template.execute("DELETE FROM customer");
         template.execute("DELETE FROM cardholder");
+        template.execute("DELETE FROM rewards_programme");
     }
 }

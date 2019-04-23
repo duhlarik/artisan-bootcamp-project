@@ -21,10 +21,10 @@ import static org.junit.Assert.assertEquals;
 public class RewardStepdefs {
 
     private static final String SOME_RETAILER = "GRIFTERS";
-    private Double rewardsBalance;
     private WebClient client;
     private HttpStatus creationResponseCode;
     private Account account;
+    ClientResponse response;
 
     public RewardStepdefs() {
         final String endpoint = System.getProperty("integration-endpoint", "http://localhost:8080");
@@ -44,7 +44,7 @@ public class RewardStepdefs {
     }
 
     @Given("the retailer BESTBUY offering 1% rewards")
-    public void theRetailerBESTBUYOffering1PercentRewards(){
+    public void theRetailerBESTBUYOffering1PercentRewards() {
         createRewardsProgramme("BESTBUY");
     }
 
@@ -57,14 +57,13 @@ public class RewardStepdefs {
 
     @When("someone requests the TARGET rewards balance")
     public void someoneRequestsTheTARGETRewardsBalance() {
-        ClientResponse response = client
+        response = client
                 .get()
                 .uri("/api/account/" + account.getCreditCardNumber() + "/rewards/TARGET")
                 .exchange()
                 .block();
 
-        assertEquals(HttpStatus.OK, response.statusCode());
-        rewardsBalance = response.bodyToMono(Double.class).block();
+        creationResponseCode = response.statusCode();
     }
 
     @Then("the reward programme is created")
@@ -72,9 +71,14 @@ public class RewardStepdefs {
         assertEquals(HttpStatus.CREATED, creationResponseCode);
     }
 
+    @Then("they receive an error message")
+    public void receiveAnError(){
+        assertEquals(HttpStatus.BAD_REQUEST, response.statusCode());
+    }
 
     @Then("they see a balance of {double}")
     public void theySeeABalanceOf(Double double1) {
+        double rewardsBalance = response.bodyToMono(Double.class).block();
         assertEquals(double1, rewardsBalance, TransactionRecord.DELTA);
     }
 

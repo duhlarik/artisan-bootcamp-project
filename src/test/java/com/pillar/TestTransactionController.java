@@ -4,7 +4,7 @@ import com.pillar.account.Account;
 import com.pillar.account.AccountRepository;
 import com.pillar.cardholder.Cardholder;
 import com.pillar.transaction.Transaction;
-import com.pillar.transaction.TransactionRepository;
+import com.pillar.transaction.TransactionRecordRepository;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.http.HttpStatus;
@@ -26,7 +26,7 @@ public class TestTransactionController {
     private BankService bankService;
     private AccountRepository accountRepository;
     private Account testAccount;
-    private TransactionRepository transactionRepository;
+    private TransactionRecordRepository transactionRecordRepository;
 
     private Transaction validTransaction;
     private Transaction invalidTransaction;
@@ -34,10 +34,10 @@ public class TestTransactionController {
     @Before
     public void setUp() {
         accountRepository = mock(AccountRepository.class);
-        transactionRepository = mock(TransactionRepository.class);
+        transactionRecordRepository = mock(TransactionRecordRepository.class);
         bankService = mock(BankService.class);
 
-        controller = new TransactionController(accountRepository, transactionRepository, bankService);
+        controller = new TransactionController(accountRepository, transactionRecordRepository, bankService);
 
         mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
         testAccount = new Account(1, 10000, "1234", true, new Cardholder());

@@ -4,7 +4,7 @@ import com.pillar.account.Account;
 import com.pillar.account.AccountRepository;
 import com.pillar.transaction.Transaction;
 import com.pillar.transaction.TransactionRecord;
-import com.pillar.transaction.TransactionRepository;
+import com.pillar.transaction.TransactionRecordRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,13 +16,13 @@ import java.time.Instant;
 public class TransactionController {
 
     private AccountRepository accountRepository;
-    private TransactionRepository transactionRepository;
+    private TransactionRecordRepository transactionRecordRepository;
 
     private BankService bankService;
 
-    public TransactionController(AccountRepository repository, TransactionRepository transactionRepository, BankService bankService){
+    public TransactionController(AccountRepository repository, TransactionRecordRepository transactionRecordRepository, BankService bankService){
         this.accountRepository = repository;
-        this.transactionRepository = transactionRepository;
+        this.transactionRecordRepository = transactionRecordRepository;
         this.bankService = bankService;
     }
 
@@ -37,7 +37,7 @@ public class TransactionController {
     public ResponseEntity<TransactionResponse> createDbTransaction(@RequestBody TransactionRequest request) {
         Account account = accountRepository.findByCardNumber(request.getCreditCardNumber());
         TransactionRecord transaction = new TransactionRecord(request.getAmount(), request.dateOfTransaction, true, account);
-        transaction = transactionRepository.save(transaction);
+        transaction = transactionRecordRepository.save(transaction);
         return new ResponseEntity<>(new TransactionResponse(transaction.getId(), transaction.isApproved()), HttpStatus.CREATED);
     }
 

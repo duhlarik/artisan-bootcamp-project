@@ -5,7 +5,7 @@ import com.pillar.TransactionController;
 import com.pillar.account.Account;
 import com.pillar.transaction.Transaction;
 import com.pillar.transaction.TransactionRecord;
-import com.pillar.transaction.TransactionRepository;
+import com.pillar.transaction.TransactionRecordRepository;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -47,7 +47,7 @@ public class TestTransaction {
     private AccountApiController accountApiController;
 
     @Autowired
-    private TransactionRepository transactionRepository;
+    private TransactionRecordRepository transactionRecordRepository;
 
     @Autowired
     JdbcTemplate jdbcTemplate;
@@ -83,7 +83,7 @@ public class TestTransaction {
 
         TransactionController.TransactionResponse responseBody = response.getBody();
 
-        TransactionRecord dbTransaction = transactionRepository.findById(responseBody.getTransactionId()).get();
+        TransactionRecord dbTransaction = transactionRecordRepository.findById(responseBody.getTransactionId()).get();
         assertEquals(request.getAmount(), dbTransaction.getAmount());
         assertEquals(request.getDateOfTransaction(), dbTransaction.getDateOfTransaction());
         assertEquals(account, dbTransaction.getAccount());

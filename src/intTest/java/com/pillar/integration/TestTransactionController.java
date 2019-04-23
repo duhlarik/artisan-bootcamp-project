@@ -28,16 +28,19 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import static com.pillar.TransactionController.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @Rollback
 @RunWith(SpringRunner.class)
-public class TestTransaction {
+public class TestTransactionController {
     private static final String TEST_CARDHOLDER_NAME = "Steve Goliath";
     private static final String TEST_CARDHOLDER_SSN = "123-45-6789";
     private static final String TEST_BUSINESS = "Target";
+    public static final Instant NOW = Instant.now();
+    public static final String RETAILER = "TARGET";
 
     private Account account;
 
@@ -78,10 +81,10 @@ public class TestTransaction {
     public void testTransactionOf100IsRecordedAgainstTheTestCustomerAccount() {
         createAccount();
         Instant dateOfTransaction = Instant.now().truncatedTo(ChronoUnit.SECONDS);
-        TransactionController.TransactionRequest request = new TransactionController.TransactionRequest(account.getCreditCardNumber(), 100.0, dateOfTransaction, "Electronics XYZ");
-        ResponseEntity<TransactionController.TransactionResponse> response = transactionController.createDbTransaction(request);
+        TransactionRequest request = new TransactionRequest(account.getCreditCardNumber(), 100.0, dateOfTransaction, "Electronics XYZ");
+        ResponseEntity<TransactionResponse> response = transactionController.createDbTransaction(request);
 
-        TransactionController.TransactionResponse responseBody = response.getBody();
+        TransactionResponse responseBody = response.getBody();
 
         TransactionRecord dbTransaction = transactionRecordRepository.findById(responseBody.getTransactionId()).get();
         assertEquals(request.getAmount(), dbTransaction.getAmount());
@@ -98,6 +101,37 @@ public class TestTransaction {
         params.put(AccountApiController.BUSINESS_NAME, TEST_BUSINESS);
 
         account = accountApiController.create(params).getBody();
+    }
+
+    @Test
+    public void createDBTransactionReturnsSavedTransactionGivenTransactionBelowCreditLimit() {
+        createAccount();
+        TransactionRequest request = new TransactionRequest(account.getCreditCardNumber(), account.getCreditLimit() - 1.0, NOW, RETAILER);
+
+        ResponseEntity<TransactionResponse> entity = transactionController.createDbTransaction(request);
+
+        assertEquals(HttpStatus.CREATED, entity.getStatusCode());
+    }
+
+    @Test
+    public void createDBTransactionReturns403ForbiddenGivenTransactionAboveCreditLimit() {
+        createAccount();
+        TransactionRequest request = new TransactionRequest(account.getCreditCardNumber(), account.getCreditLimit() + 1.0, NOW, RETAILER);
+
+        ResponseEntity<TransactionResponse> entity = transactionController.createDbTransaction(request);
+
+        assertEquals(HttpStatus.FORBIDDEN, entity.getStatusCode());
+    }
+
+    @Test
+    public void createDBTransactionReturns403ForbiddenWhenGivenTwoTransactionEachWithAmountOfCreditLimit() {
+        createAccount();
+        TransactionRequest request = new TransactionRequest(account.getCreditCardNumber(), new Double(account.getCreditLimit()), NOW, RETAILER);
+        transactionController.createDbTransaction(request);
+
+        ResponseEntity<TransactionResponse> entity = transactionController.createDbTransaction(request);
+
+        assertEquals(HttpStatus.FORBIDDEN, entity.getStatusCode());
     }
 
     @After

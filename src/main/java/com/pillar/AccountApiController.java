@@ -76,28 +76,29 @@ public class AccountApiController {
     @GetMapping(path = "/{cardNumber}")
     public ResponseEntity<Account> getAccount(@PathVariable String cardNumber) {
         final Optional<Account> found = accountRepository.findOneByCreditCardNumber(cardNumber);
-        if(found.isPresent()){
+        if (found.isPresent()) {
             Account account = found.get();
             ArrayList<TransactionRecord> transactionRecordList = this.transactionRecordRepository.findAllByAccount(account);
             account.setTransactionBalance(TransactionRecordGenerator.calculateTransactionBalance(transactionRecordList));
             account.setChargeBalance(TransactionRecordGenerator.calculateChargeBalance(transactionRecordList));
             return new ResponseEntity<>(account, HttpStatus.OK);
-        }else{
+        } else {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
 
     @GetMapping(path = "/{cardNumber}/rewards/{retailer}")
-    public ResponseEntity<Double> getRewardsBalance(String cardNumber, String retailer) {
-        final Optional<Account> found = accountRepository.findOneByCreditCardNumber(cardNumber);
-        if(found.isPresent() && rewardsProgrammeRepository.existsByRetailer(retailer)){
-            Account account = found.get();
-            ArrayList<TransactionRecord> transactionRecordList = this.transactionRecordRepository.findAllByAccount(account);
-            double chargeBalance = TransactionRecordGenerator.calculateChargeBalance(transactionRecordList);
+    public ResponseEntity<Double> getRewardsBalance(@PathVariable String cardNumber, @PathVariable String retailer) {
+        Account found = accountRepository.findByCardNumber(cardNumber);
+
+        ArrayList<TransactionRecord> transactionRecordList = this.transactionRecordRepository.findAllByAccount(found);
+        double chargeBalance = TransactionRecordGenerator.calculateChargeBalanceByRetailer(transactionRecordList, retailer);
+
+        if (rewardsProgrammeRepository.existsByRetailer(retailer)) {
             double percentage = rewardsProgrammeRepository.findOneByRetailer(retailer).get().getPercentage();
             return new ResponseEntity<>(new RewardsBalance(chargeBalance, percentage).calculate(), HttpStatus.OK);
-        }else{
-            return new ResponseEntity<>(Double.MIN_VALUE, HttpStatus.NOT_FOUND);
+        } else {
+            return new ResponseEntity<>(Double.MIN_VALUE, HttpStatus.BAD_REQUEST);
         }
     }
 }

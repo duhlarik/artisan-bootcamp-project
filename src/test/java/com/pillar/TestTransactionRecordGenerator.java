@@ -30,7 +30,7 @@ public class TestTransactionRecordGenerator {
 
     @Test
     public void givenTransactionOf100AndNoExistingTransactionsAndCreditLimitOf1000ReturnTransactionRecordWithAmount100() {
-        TransactionRecordGenerator generator = new TransactionRecordGenerator(100, EMPTY_LIST, NOW, IS_CHARGE, ACCOUNT);
+        TransactionRecordGenerator generator = new TransactionRecordGenerator(100, EMPTY_LIST, NOW, IS_CHARGE, ACCOUNT, "");
 
         TransactionRecord transactionRecord = generator.generate();
 
@@ -40,7 +40,7 @@ public class TestTransactionRecordGenerator {
     @Test
     public void givenTxOf2ReturnTxRecordWithAmount2() {
         double expected = 2;
-        TransactionRecordGenerator generator = new TransactionRecordGenerator(expected, EMPTY_LIST, NOW, IS_CHARGE, ACCOUNT);
+        TransactionRecordGenerator generator = new TransactionRecordGenerator(expected, EMPTY_LIST, NOW, IS_CHARGE, ACCOUNT, "");
 
         TransactionRecord txRecord = generator.generate();
 
@@ -49,7 +49,7 @@ public class TestTransactionRecordGenerator {
 
     @Test
     public void givenTransactionOf100AndNoExistingTransactionsAndCreditLimitOf1000ReturnApprovedTransaction() {
-        TransactionRecordGenerator generator = new TransactionRecordGenerator(100, EMPTY_LIST, NOW, IS_CHARGE, new Account(ID, 1000, CC_NUMBER, ACTIVE, CARDHOLDER));
+        TransactionRecordGenerator generator = new TransactionRecordGenerator(100, EMPTY_LIST, NOW, IS_CHARGE, new Account(ID, 1000, CC_NUMBER, ACTIVE, CARDHOLDER), "");
 
         TransactionRecord transactionRecord = generator.generate();
 
@@ -58,7 +58,7 @@ public class TestTransactionRecordGenerator {
 
     @Test
     public void givenValidChargeTransactionReturnApprovedChargeTransaction() {
-        TransactionRecordGenerator generator = new TransactionRecordGenerator(AMOUNT, EMPTY_LIST, NOW, true, ACCOUNT);
+        TransactionRecordGenerator generator = new TransactionRecordGenerator(AMOUNT, EMPTY_LIST, NOW, true, ACCOUNT, "");
 
         TransactionRecord transactionRecord = generator.generate();
 
@@ -68,7 +68,7 @@ public class TestTransactionRecordGenerator {
     @Test
     public void givenTransactionAtSomeTimeReturnTransactionRecordForThatTime() {
         Instant someTime = NOW.minusSeconds(10);
-        TransactionRecordGenerator generator = new TransactionRecordGenerator(AMOUNT, EMPTY_LIST, someTime, IS_CHARGE, ACCOUNT);
+        TransactionRecordGenerator generator = new TransactionRecordGenerator(AMOUNT, EMPTY_LIST, someTime, IS_CHARGE, ACCOUNT, "");
 
         TransactionRecord transactionRecord = generator.generate();
 
@@ -77,7 +77,7 @@ public class TestTransactionRecordGenerator {
 
     @Test
     public void givenTxOf1000AndCreditLimitOf100ReturnUnapprovedTransaction() {
-        TransactionRecordGenerator generator = new TransactionRecordGenerator(1000, EMPTY_LIST, NOW, IS_CHARGE, ACCOUNT);
+        TransactionRecordGenerator generator = new TransactionRecordGenerator(1000, EMPTY_LIST, NOW, IS_CHARGE, ACCOUNT, "");
 
         TransactionRecord transactionRecord = generator.generate();
 
@@ -87,7 +87,7 @@ public class TestTransactionRecordGenerator {
     @Test
     public void givenTxOf2AndTransactionsSumming2AndCreditLimitOf0ReturnUnapprovedTransaction() {
         Account account = new Account(ID, 0, CC_NUMBER, ACTIVE, CARDHOLDER);
-        TransactionRecordGenerator generator = new TransactionRecordGenerator(2, list(new TransactionRecord(2.0, NOW, false, account)), NOW, IS_CHARGE, account);
+        TransactionRecordGenerator generator = new TransactionRecordGenerator(2, list(new TransactionRecord(2.0, NOW, false, account)), NOW, IS_CHARGE, account, "");
 
         TransactionRecord txRecord = generator.generate();
 
@@ -99,7 +99,7 @@ public class TestTransactionRecordGenerator {
         Integer accountId = 15;
         Account account = new Account(accountId, (int) CREDIT_LIMIT, CC_NUMBER, ACTIVE, CARDHOLDER);
 
-        TransactionRecordGenerator generator = new TransactionRecordGenerator(AMOUNT, EMPTY_LIST, NOW, IS_CHARGE, account);
+        TransactionRecordGenerator generator = new TransactionRecordGenerator(AMOUNT, EMPTY_LIST, NOW, IS_CHARGE, account, "");
         TransactionRecord transactionRecord = generator.generate();
 
         assertEquals(accountId, transactionRecord.getAccount().getId());
@@ -158,7 +158,7 @@ public class TestTransactionRecordGenerator {
     @Test
     public void isValidReturnsTrueGivenBalance5_Amount5_CreditLimit_10() {
         Account account = new Account(ID, 10, CC_NUMBER, ACTIVE, CARDHOLDER);
-        TransactionRecordGenerator transactionRecordGenerator = new TransactionRecordGenerator(5, list(new TransactionRecord(5.0, NOW, APPROVED, account)), NOW, IS_CHARGE, account);
+        TransactionRecordGenerator transactionRecordGenerator = new TransactionRecordGenerator(5, list(new TransactionRecord(5.0, NOW, APPROVED, account)), NOW, IS_CHARGE, account, "");
 
         boolean isValid = transactionRecordGenerator.isTransactionValid();
 
@@ -168,10 +168,21 @@ public class TestTransactionRecordGenerator {
     @Test
     public void isValidReturnsFalseGivenAmount6_Balance5_CreditLimit_10() {
         Account account = new Account(ID, 10, CC_NUMBER, ACTIVE, CARDHOLDER);
-        TransactionRecordGenerator transactionRecordGenerator = new TransactionRecordGenerator(6, list(new TransactionRecord(5.0, NOW, APPROVED, account)), NOW, IS_CHARGE, account);
+        TransactionRecordGenerator transactionRecordGenerator = new TransactionRecordGenerator(6, list(new TransactionRecord(5.0, NOW, APPROVED, account)), NOW, IS_CHARGE, account, "");
 
         boolean isValid = transactionRecordGenerator.isTransactionValid();
 
         assertFalse(isValid);
+    }
+
+    @Test
+    public void calculateChargeBalanceByRetailerReturns100GivenRetailerTarget_BestbuyChargeOf50AndTargetChargeOf100() {
+        Account account = new Account(ID, 10000, CC_NUMBER, ACTIVE, CARDHOLDER);
+        TransactionRecord bestbuy = new TransactionRecord(50.0, NOW, APPROVED, account, true, "BESTBUY");
+        TransactionRecord target = new TransactionRecord(100.0, NOW, APPROVED, account, true, "TARGET");
+
+        double actual = TransactionRecordGenerator.calculateChargeBalanceByRetailer(list(bestbuy, target), "TARGET");
+
+        assertEquals(100, actual,0.001);
     }
 }

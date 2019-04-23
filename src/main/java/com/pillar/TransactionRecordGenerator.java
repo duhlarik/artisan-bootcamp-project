@@ -12,13 +12,15 @@ public class TransactionRecordGenerator {
     private double amount;
     private ArrayList<TransactionRecord> transactions;
     private Account account;
+    private String retailer;
 
-    public TransactionRecordGenerator(double amount, ArrayList<TransactionRecord> existingTransaction, Instant dateOfTransaction, boolean isCharge, Account account) {
+    public TransactionRecordGenerator(double amount, ArrayList<TransactionRecord> existingTransaction, Instant dateOfTransaction, boolean isCharge, Account account, String retailer) {
         this.dateOfTransaction = dateOfTransaction;
         this.amount = amount;
         this.isCharge = isCharge;
         this.transactions = existingTransaction;
         this.account = account;
+        this.retailer = retailer;
     }
 
     public static double calculateTransactionBalance(ArrayList<TransactionRecord> list) {
@@ -34,8 +36,16 @@ public class TransactionRecordGenerator {
                 .sum();
     }
 
+    public static double calculateChargeBalanceByRetailer(ArrayList<TransactionRecord> list, String retailer) {
+        return list.stream()
+                .filter(TransactionRecord::isCharge)
+                .filter(txRecord -> txRecord.getRetailer().equals(retailer))
+                .mapToDouble(TransactionRecord::getAmount)
+                .sum();
+    }
+
     public TransactionRecord generate() {
-        return new TransactionRecord(this.amount, dateOfTransaction, isTransactionValid(), this.account, isCharge);
+        return new TransactionRecord(this.amount, dateOfTransaction, isTransactionValid(), this.account, isCharge, retailer);
     }
 
     public boolean isTransactionValid() {

@@ -98,13 +98,14 @@ public class RewardStepdefs {
         payload.put(AccountApiController.CARDHOLDER_SSN, "123");
         payload.put(AccountApiController.BUSINESS_NAME, "Flintrock");
 
-        return client.post()
+        ClientResponse response = client.post()
                 .uri(AccountApiController.ENDPOINT)
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(BodyInserters.fromObject(payload))
                 .exchange()
-                .block()
-                .bodyToMono(Account.class)
+                .block();
+        assertEquals(HttpStatus.CREATED, response.statusCode());
+        return response.bodyToMono(Account.class)
                 .block();
     }
 

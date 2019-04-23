@@ -85,7 +85,7 @@ public class TestTransactionController {
     @Test
     public void returns201CreatedIfSumOfBalanceAndAmountEqualToCreditLimit() {
         Double balance = account.getCreditLimit() - AMOUNT_BELOW_CREDIT_LIMIT;
-        transactionRecordRepository.save(new TransactionRecord(balance, NOW, APPROVED, account));
+        transactionRecordRepository.save(new TransactionRecord(balance, NOW, APPROVED, account, true, RETAILER));
         TransactionRequest request = new TransactionRequest(account.getCreditCardNumber(), AMOUNT_BELOW_CREDIT_LIMIT, NOW, RETAILER);
 
         ResponseEntity<TransactionResponse> response = transactionController.createDbTransaction(request);
@@ -98,7 +98,7 @@ public class TestTransactionController {
     public void returns403ForbiddenIfSumOfBalanceAndAmountAreAboveTheCreditLimit() {
         Double amount = AMOUNT_BELOW_CREDIT_LIMIT;
         Double balance = (double) account.getCreditLimit();
-        transactionRecordRepository.save(new TransactionRecord(balance, NOW, APPROVED, account));
+        transactionRecordRepository.save(new TransactionRecord(balance, NOW, APPROVED, account, true, RETAILER));
         TransactionRequest request = new TransactionRequest(account.getCreditCardNumber(), amount, NOW, RETAILER);
 
         ResponseEntity<TransactionResponse> response = transactionController.createDbTransaction(request);

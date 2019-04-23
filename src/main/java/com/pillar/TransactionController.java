@@ -44,7 +44,7 @@ public class TransactionController {
     public ResponseEntity<TransactionResponse> createDbTransaction(@RequestBody TransactionRequest request) {
         Account account = accountRepository.findByCardNumber(request.getCreditCardNumber());
         ArrayList<TransactionRecord> transactionRecordList = transactionRecordRepository.findAllByAccount(account);
-        TransactionRecord record = new TransactionRecordGenerator(request.getAmount(), transactionRecordList, request.getDateOfTransaction(), request.isCharge, account).generate();
+        TransactionRecord record = new TransactionRecordGenerator(request.getAmount(), transactionRecordList, request.getDateOfTransaction(), request.isCharge, account, request.getRetailer()).generate();
 
         if(record.isApproved()){
             TransactionRecord txRecord = transactionRecordRepository.save(record);
@@ -59,7 +59,7 @@ public class TransactionController {
     @RequestMapping(path = "/payment", method={RequestMethod.POST})
     public ResponseEntity<TransactionResponse> createPaymentTransaction(@RequestBody TransactionRequest request) {
         Account account = accountRepository.findByCardNumber(request.getCreditCardNumber());
-        TransactionRecord transaction = new TransactionRecord(-1 * request.getAmount(), request.getDateOfTransaction().truncatedTo(ChronoUnit.SECONDS), true, account, true);
+        TransactionRecord transaction = new TransactionRecord(-1 * request.getAmount(), request.getDateOfTransaction().truncatedTo(ChronoUnit.SECONDS), true, account, true, request.getRetailer());
         TransactionRecord savedTransactionRecord = transactionRecordRepository.save(transaction);
         return new ResponseEntity<>(new TransactionResponse(savedTransactionRecord.getId(), true), HttpStatus.CREATED);
     }
@@ -119,7 +119,9 @@ public class TransactionController {
             return dateOfTransaction;
         }
 
-
+        public String getRetailer() {
+            return retailer;
+        }
     }
 
 }

@@ -1,13 +1,13 @@
 package com.pillar.integration;
 
 import com.pillar.AccountApiController;
-import com.pillar.rewardsProgramme.RewardsProgramme;
-import com.pillar.rewardsProgramme.RewardsProgrammeRepository;
 import com.pillar.TransactionController;
 import com.pillar.account.Account;
 import com.pillar.account.AccountRepository;
 import com.pillar.cardholder.CardholderRepository;
 import com.pillar.customer.CustomerRepository;
+import com.pillar.rewardsProgramme.RewardsProgramme;
+import com.pillar.rewardsProgramme.RewardsProgrammeRepository;
 import com.pillar.transaction.TransactionRecord;
 import org.junit.After;
 import org.junit.Before;
@@ -148,8 +148,8 @@ public class TestAccountAPIController {
         double charge1 = 1.0;
         double charge2 = 2.0;
         String creditCardNumber = account.getCreditCardNumber();
-        createChargeTransaction(creditCardNumber, charge1);
-        createChargeTransaction(creditCardNumber, charge2);
+        createChargeTransaction(creditCardNumber, charge1, RETAILER);
+        createChargeTransaction(creditCardNumber, charge2, RETAILER);
 
         ResponseEntity<Account> entity = controller.getAccount(creditCardNumber);
 
@@ -169,7 +169,7 @@ public class TestAccountAPIController {
     public void getAccountReturnsAccountWithChargeBalanceEqualToAmountOfChargeTransactionGiven() {
         String creditCardNumber = account.getCreditCardNumber();
         double chargeAmount = 2.0;
-        createChargeTransaction(creditCardNumber, chargeAmount);
+        createChargeTransaction(creditCardNumber, chargeAmount, RETAILER);
 
         ResponseEntity<Account> entity = controller.getAccount(creditCardNumber);
 
@@ -179,7 +179,7 @@ public class TestAccountAPIController {
     @Test
     public void getRewardsBalanceReturns1GivenChargeBalanceOf100AtRetailer_AndRewardPercentageOf1Percent() {
         rewardsProgrammeRepository.save(new RewardsProgramme(RETAILER, 1));
-        createChargeTransaction(account.getCreditCardNumber(), 100);
+        createChargeTransaction(account.getCreditCardNumber(), 100, RETAILER);
 
         ResponseEntity<Double> entity = controller.getRewardsBalance(account.getCreditCardNumber(), RETAILER);
 
@@ -188,13 +188,23 @@ public class TestAccountAPIController {
     }
 
     @Test
-    public void getRewardsBalanceReturns404NotFoundGivenRetailerWithoutRewardsProgramme() {
+    public void getRewardsBalanceReturns400BadRequestGivenRetailerWithoutRewardsProgramme() {
         ResponseEntity<Double> entity = controller.getRewardsBalance(account.getCreditCardNumber(), "NONEXISTENT_RETAILER");
 
-        assertEquals(HttpStatus.NOT_FOUND, entity.getStatusCode());
+        assertEquals(HttpStatus.BAD_REQUEST, entity.getStatusCode());
     }
 
-    private void createChargeTransaction(String creditCardNumber, double amount) {
+    @Test
+    public void getRewardsBalanceReturns0GivenChargeBalanceOf100AtBESTBUYAnd1PercentRewardsAtTARGET() {
+        rewardsProgrammeRepository.save(new RewardsProgramme("TARGET", 1));
+        createChargeTransaction(account.getCreditCardNumber(), 100, "BESTBUY");
+
+        ResponseEntity<Double> entity = controller.getRewardsBalance(account.getCreditCardNumber(), "TARGET");
+
+        assertEquals(0, entity.getBody(), 0.001);
+    }
+
+    private void createChargeTransaction(String creditCardNumber, double amount, String retailer) {
         transactionController.createDbTransaction(new TransactionRequest(creditCardNumber, amount, Instant.now(), RETAILER));
     }
 

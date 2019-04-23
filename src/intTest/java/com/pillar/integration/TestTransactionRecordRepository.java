@@ -29,6 +29,7 @@ public class TestTransactionRecordRepository {
     private static final Double AMOUNT = 5.0;
     private static final Instant NOW = Instant.now();
     private static final boolean APPROVED = true;
+    private static final String RETAILER = "BestBuy";
 
     @Autowired
     private TransactionRecordRepository transactionRecordRepository;
@@ -46,7 +47,7 @@ public class TestTransactionRecordRepository {
         createAccount();
         boolean isCharge = false;
 
-        TransactionRecord inputTxRecord = new TransactionRecord(AMOUNT, NOW, APPROVED, account, isCharge);
+        TransactionRecord inputTxRecord = new TransactionRecord(AMOUNT, NOW, APPROVED, account, isCharge, RETAILER);
         TransactionRecord outputTxRecord = transactionRecordRepository.save(inputTxRecord);
 
         assertEquals(isCharge, outputTxRecord.isCharge());
@@ -57,7 +58,7 @@ public class TestTransactionRecordRepository {
         createAccount();
         boolean isCharge = true;
 
-        TransactionRecord inputTxRecord = new TransactionRecord(AMOUNT, NOW, APPROVED, account, isCharge);
+        TransactionRecord inputTxRecord = new TransactionRecord(AMOUNT, NOW, APPROVED, account, isCharge, RETAILER);
         TransactionRecord outputTxRecord = transactionRecordRepository.save(inputTxRecord);
 
         assertEquals(isCharge, outputTxRecord.isCharge());

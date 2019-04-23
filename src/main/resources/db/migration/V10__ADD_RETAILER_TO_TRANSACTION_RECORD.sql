@@ -1,0 +1,1 @@
+ALTER TABLE transaction_record ADD COLUMN retailer VARCHAR(255) NOT NULL;

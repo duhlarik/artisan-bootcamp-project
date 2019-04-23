@@ -16,6 +16,7 @@ public class TransactionRecord {
     private Instant dateOfTransaction;
     private boolean approved;
     private boolean isCharge;
+    private String retailer;
 
     @ManyToOne
     @JoinColumn(name = "account_id")
@@ -30,6 +31,12 @@ public class TransactionRecord {
     public TransactionRecord(double amount, Instant date, boolean approved, Account account, boolean isCharge) {
         setFields(amount, date, approved, account);
         this.isCharge = isCharge;
+    }
+
+    public TransactionRecord(double amount, Instant dateOfTransaction, boolean approved, Account account, boolean isCharge, String retailer) {
+        setFields(amount, dateOfTransaction, approved, account);
+        this.isCharge = isCharge;
+        this.retailer = retailer;
     }
 
     private void setFields(double amount, Instant date, boolean approved, Account account) {
@@ -61,5 +68,9 @@ public class TransactionRecord {
 
     public boolean isCharge() {
         return isCharge;
+    }
+
+    public String getRetailer() {
+        return retailer;
     }
 }
